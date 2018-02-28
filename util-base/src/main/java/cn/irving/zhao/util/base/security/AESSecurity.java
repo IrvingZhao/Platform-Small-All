@@ -38,10 +38,11 @@ public final class AESSecurity {
      * @param charset          内容编码
      * @return AES加密工具类
      */
-    public AESSecurity newInstances(Boolean needKeyGenerator, String cipherType, Charset charset) {
+    public static AESSecurity newInstances(Boolean needKeyGenerator, String cipherType, Charset charset) {
         return new AESSecurity(needKeyGenerator, cipherType, charset);
     }
 
+    private int keyGeneratorLength = 128;
     private Boolean keyGenerator;
     private String cipherType;
     private Charset charset = Charset.forName("UTF-8");
@@ -258,7 +259,7 @@ public final class AESSecurity {
             byte[] keyBytes;
             if (keyGenerator) {
                 KeyGenerator generator = KeyGenerator.getInstance("AES");
-                generator.init(new SecureRandom(password.getBytes()));
+                generator.init(keyGeneratorLength, new SecureRandom(password.getBytes()));
                 SecretKey secretKey = generator.generateKey();
                 keyBytes = secretKey.getEncoded();
             } else {
@@ -276,5 +277,13 @@ public final class AESSecurity {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public int getKeyGeneratorLength() {
+        return keyGeneratorLength;
+    }
+
+    public void setKeyGeneratorLength(int keyGeneratorLength) {
+        this.keyGeneratorLength = keyGeneratorLength;
     }
 }
