@@ -2,9 +2,11 @@ package cn.irving.zhao.util.poi.config;
 
 import cn.irving.zhao.util.poi.annonation.Sheet;
 import cn.irving.zhao.util.poi.enums.SheetType;
+import cn.irving.zhao.util.poi.exception.ExportException;
 import cn.irving.zhao.util.poi.formatter.SheetNameFormatter;
 import cn.irving.zhao.util.poi.formatter.FormatterFactory;
 
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 /**
@@ -27,40 +29,59 @@ public class SheetConfig {
 
     private Function<Object, Object> dataGetter;
 
+    private BiConsumer<Object, Object> dataSetter;
+
+    private Class<?> dataType;
+
     private SheetNameFormatter sheetNameFormatter;
 
-    public static SheetConfig createSheetConfig(Sheet sheet, Function<Object, Object> dataGetter) {
+    public static SheetConfig createSheetConfig(Sheet sheet, Function<Object, Object> dataGetter,
+                                                BiConsumer<Object, Object> dataSetter, Class<?> dataType) {
         SheetConfig result = new SheetConfig();
         if (sheet.type() == SheetType.INNER) {
             result.baseRow = sheet.baseRow();
             result.baseCol = sheet.baseCol();
         } else if (sheet.type() == SheetType.OUTER) {
             result.name = sheet.name();
+            if (sheet.nameFormatter() != SheetNameFormatter.class) {
+                result.sheetNameFormatter = factory.getFormatter(sheet.nameFormatter());
+            } else {
+                throw new ExportException("类型为OUTER的Sheet必须指定SheetNameFormatter");
+            }
         }
         result.sheetType = sheet.type();
         result.dataGetter = dataGetter;
-        if (sheet.nameFormatter() != SheetNameFormatter.class) {
-            result.sheetNameFormatter = factory.getFormatter(sheet.nameFormatter());
-        }
+        result.dataSetter = dataSetter;
+        result.dataType = dataType;
         return result;
     }
 
-    public static SheetConfig createOuterSheet(String name, SheetCellConfig sheetCellConfig, Function<Object, Object> dataGetter) {
+    public static SheetConfig createOuterSheet(String name, SheetCellConfig sheetCellConfig,
+                                               SheetNameFormatter sheetNameFormatter,
+                                               Function<Object, Object> dataGetter,
+                                               BiConsumer<Object, Object> dataSetter, Class<?> dataType) {
         SheetConfig result = new SheetConfig();
         result.sheetType = SheetType.OUTER;
+        result.sheetNameFormatter = sheetNameFormatter;
         result.name = name;
         result.sheetCellConfig = sheetCellConfig;
         result.dataGetter = dataGetter;
+        result.dataSetter = dataSetter;
+        result.dataType = dataType;
         return result;
     }
 
-    public static SheetConfig createInnerSheet(int baseRow, int baseCol, SheetCellConfig sheetCellConfig, Function<Object, Object> dataGetter) {
+    public static SheetConfig createInnerSheet(int baseRow, int baseCol, SheetCellConfig sheetCellConfig,
+                                               Function<Object, Object> dataGetter,
+                                               BiConsumer<Object, Object> dataSetter, Class<?> dataType) {
         SheetConfig result = new SheetConfig();
         result.baseRow = baseRow;
         result.baseCol = baseCol;
         result.sheetCellConfig = sheetCellConfig;
         result.sheetType = SheetType.INNER;
         result.dataGetter = dataGetter;
+        result.dataSetter = dataSetter;
+        result.dataType = dataType;
         return result;
     }
 
@@ -90,6 +111,10 @@ public class SheetConfig {
 
     public Object getData(Object source) {
         return dataGetter.apply(source);
+    }
+
+    public void setData(Object source, Object data) {
+        dataSetter.accept(source, data);
     }
 
     public SheetType getSheetType() {
@@ -154,6 +179,24 @@ public class SheetConfig {
 
     public void setSheetNameFormatter(SheetNameFormatter sheetNameFormatter) {
         this.sheetNameFormatter = sheetNameFormatter;
+    }
+
+    public BiConsumer<Object, Object> getDataSetter() {
+        return dataSetter;
+    }
+
+    public SheetConfig setDataSetter(BiConsumer<Object, Object> dataSetter) {
+        this.dataSetter = dataSetter;
+        return this;
+    }
+
+    public Class<?> getDataType() {
+        return dataType;
+    }
+
+    public SheetConfig setDataType(Class<?> dataType) {
+        this.dataType = dataType;
+        return this;
     }
 }
 

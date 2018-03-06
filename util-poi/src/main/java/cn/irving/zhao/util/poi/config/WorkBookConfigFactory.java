@@ -7,6 +7,7 @@ import org.apache.commons.collections4.map.ReferenceMap;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 /**
@@ -60,7 +61,8 @@ public final class WorkBookConfigFactory {
                 result = (WorkBookConfig) tempConfig;
             } else if (SheetCellConfig.class.isInstance(tempConfig)) {
                 result = new WorkBookConfig();
-                result.addDefaultInnerSheetConfig(SheetConfig.createInnerSheet(0, 0, (SheetCellConfig) tempConfig, null));
+                result.addDefaultInnerSheetConfig(SheetConfig.createInnerSheet(0, 0, (SheetCellConfig) tempConfig
+                        , null, null, null));
             }
         }
 
@@ -77,7 +79,7 @@ public final class WorkBookConfigFactory {
         Sheet sheet = field.getAnnotation(Sheet.class);//工作表注解
         Repeatable repeatable = field.getAnnotation(Repeatable.class);//是否重复
 
-        SheetConfig sheetConfig = SheetConfig.createSheetConfig(sheet, me.getDataGetter(field));//构建单元表
+        SheetConfig sheetConfig = SheetConfig.createSheetConfig(sheet, me.getDataGetter(field), me.getDataSetter(field), field.getType());//构建单元表
         Class<?> fieldType;
         if (repeatable == null) {
             fieldType = field.getType();
@@ -108,7 +110,7 @@ public final class WorkBookConfigFactory {
         Repeatable repeatable = field.getAnnotation(Repeatable.class);//是否循环
         MergedRegion mergedRegion = field.getAnnotation(MergedRegion.class);//是否合并单元格
         Formatter formatter = field.getAnnotation(Formatter.class);
-        return new CellConfig(cell, repeatable, mergedRegion, formatter, getDataGetter(field));
+        return new CellConfig(cell, repeatable, mergedRegion, formatter, getDataGetter(field), getDataSetter(field), field.getType());
     }
 
     /**
@@ -144,6 +146,17 @@ public final class WorkBookConfigFactory {
                 e.printStackTrace();
             }
             return null;
+        };
+    }
+
+    private BiConsumer<Object, Object> getDataSetter(Field field) {
+        return (source, data) -> {
+            try {
+                field.setAccessible(true);
+                field.set(source, data);
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
         };
     }
 

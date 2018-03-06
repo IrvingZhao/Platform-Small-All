@@ -6,6 +6,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.util.Collection;
 
 /**
  * 循环配置信息
@@ -31,5 +32,15 @@ public @interface Repeatable {
      * </p>
      */
     int max() default -1;
+
+    /**
+     * 集合具体实现类，读取时使用
+     */
+    Class<? extends Collection> collectionType() default Collection.class;
+
+    /**
+     * 单个元素的具体实现类，读取时使用
+     */
+    Class<?> itemType() default Object.class;
 
 }

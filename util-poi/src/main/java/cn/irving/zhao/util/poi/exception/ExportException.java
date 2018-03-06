@@ -3,7 +3,7 @@ package cn.irving.zhao.util.poi.exception;
 /**
  * excel导出异常
  */
-public class ExportException extends Exception {
+public class ExportException extends RuntimeException {
     public ExportException() {
     }
 

@@ -1,9 +1,11 @@
 package cn.irving.zhao.util.poi.formatter;
 
+import cn.irving.zhao.util.poi.config.CellConfig;
+import org.apache.poi.ss.usermodel.Cell;
+
 /**
  * 单元格数据格式化
  */
-@FunctionalInterface
 public interface CellDataFormatter {
 
     /**
@@ -13,12 +15,22 @@ public interface CellDataFormatter {
      * <li>excel行坐标=rowIndex+1</li>
      * </ul>
      *
-     * @param source   源数据
-     * @param rowIndex 当前单元格行坐标
-     * @param colIndex 当前单元格列坐标
+     * @param source     源数据
+     * @param cellConfig 单元格配置
+     * @param rowIv      行偏移量
+     * @param colIv      列偏移量
      * @return 格式化后数据
      */
-    Object format(Object source, int rowIndex, int colIndex);
+    default Object format(Object source, CellConfig cellConfig, int rowIv, int colIv) {
+        return source;
+    }
+
+    /**
+     * 单元格数据解析方法
+     */
+    default Object parse(Object source, CellConfig cellConfig, int rowIv, int colIv) {
+        return source;
+    }
 
     /**
      * 获得列字母坐标

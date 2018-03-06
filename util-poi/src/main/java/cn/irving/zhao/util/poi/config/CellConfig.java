@@ -6,6 +6,7 @@ import cn.irving.zhao.util.poi.annonation.MergedRegion;
 import cn.irving.zhao.util.poi.annonation.Repeatable;
 import cn.irving.zhao.util.poi.enums.CellDataType;
 
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 /**
@@ -13,17 +14,17 @@ import java.util.function.Function;
  */
 public class CellConfig {
 
-    CellConfig(Cell cell, Repeatable repeatable, MergedRegion mergedRegion, Formatter formatter, Function<Object, Object> dataGetter) {
+    CellConfig(Cell cell, Repeatable repeatable, MergedRegion mergedRegion, Formatter formatter, Function<Object, Object> dataGetter, BiConsumer<Object, Object> dataSetter, Class<?> type) {
         this(cell.rowIndex(),
                 cell.colIndex(),
                 cell.dataType(),
                 repeatable == null ? null : new RepeatConfig(repeatable),
                 mergedRegion == null ? null : new MergedConfig(cell.rowIndex(), cell.colIndex(), mergedRegion.endRowIndex(), mergedRegion.endColIndex()),
                 formatter == null ? null : new FormatterConfig(formatter),
-                dataGetter);
+                dataGetter, dataSetter, type);
     }
 
-    public CellConfig(int rowIndex, int cellIndex, CellDataType dataType, RepeatConfig repeatConfig, MergedConfig mergedConfig, FormatterConfig formatterConfig, Function<Object, Object> dataGetter) {
+    public CellConfig(int rowIndex, int cellIndex, CellDataType dataType, RepeatConfig repeatConfig, MergedConfig mergedConfig, FormatterConfig formatterConfig, Function<Object, Object> dataGetter, BiConsumer<Object, Object> dataSetter, Class<?> type) {
         this.rowIndex = rowIndex;
         this.cellIndex = cellIndex;
         this.dataType = dataType;
@@ -31,6 +32,8 @@ public class CellConfig {
         this.mergedConfig = mergedConfig;
         this.formatterConfig = formatterConfig;
         this.dataGetter = dataGetter;
+        this.dataSetter = dataSetter;
+        this.type = type;
     }
 
     private final int rowIndex;//行坐标
@@ -46,8 +49,16 @@ public class CellConfig {
 
     private final Function<Object, Object> dataGetter;//数据获取器
 
+    private final BiConsumer<Object, Object> dataSetter;//数据设置器
+
+    private final Class<?> type;//数据类型
+
     public Object getData(Object source) {
         return dataGetter.apply(source);
+    }
+
+    public void setData(Object source, Object data) {
+        dataSetter.accept(source, data);
     }
 
     public int getRowIndex() {
@@ -72,5 +83,9 @@ public class CellConfig {
 
     public FormatterConfig getFormatterConfig() {
         return formatterConfig;
+    }
+
+    public Class<?> getType() {
+        return type;
     }
 }
