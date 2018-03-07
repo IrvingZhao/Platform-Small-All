@@ -27,7 +27,7 @@ public class SheetConfig {
 
     private SheetCellConfig sheetCellConfig;//对应类对象配置信息
 
-    private Function<Object, Object> dataGetter;
+    private Function<Object, Object> dataGetter = (item) -> item;
 
     private BiConsumer<Object, Object> dataSetter;
 

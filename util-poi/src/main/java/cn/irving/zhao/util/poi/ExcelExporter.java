@@ -6,24 +6,26 @@ import cn.irving.zhao.util.poi.enums.Direction;
 import cn.irving.zhao.util.poi.enums.SheetType;
 import cn.irving.zhao.util.poi.enums.WorkbookType;
 import cn.irving.zhao.util.poi.exception.ExportException;
-import cn.irving.zhao.util.poi.formatter.CellDataFormatter;
 import cn.irving.zhao.util.poi.inter.IWorkbook;
 import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.ss.util.CellRangeAddress;
 
 import java.io.*;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * POI 工具包
  */
-public class POIUtil {
+public final class ExcelExporter extends ExcelOperator {
 
-    public void export(IWorkbook data, OutputStream outputStream, String template) throws ExportException {
+    private ExcelExporter() {
+
+    }
+
+    private static final ExcelExporter me = new ExcelExporter();
+
+    public static void export(IWorkbook data, OutputStream outputStream, String template) throws ExportException {
         try {
-            export(data, outputStream, getTemplateStreamByPath(template));
+            export(data, outputStream, me.getTemplateStreamByPath(template));
         } catch (IOException e) {
             throw new ExportException("流异常", e);
         }
@@ -36,7 +38,7 @@ public class POIUtil {
      * @param output   输出位置，物理磁盘路径
      * @param template excel模板文件流
      */
-    public void export(IWorkbook data, String output, InputStream template) throws ExportException {
+    public static void export(IWorkbook data, String output, InputStream template) throws ExportException {
         try {
             File file = new File(output);
             if (!file.exists()) {
@@ -58,7 +60,7 @@ public class POIUtil {
      * @param output   输出磁盘位置，物理磁盘位置
      * @param template 模板位置，磁盘物理路径或classpath路径，优先查找磁盘物理路径
      */
-    public void export(IWorkbook data, String output, String template) throws ExportException {
+    public static void export(IWorkbook data, String output, String template) throws ExportException {
         try {
             File file = new File(output);
             if (!file.exists()) {
@@ -67,7 +69,7 @@ public class POIUtil {
                 }
             }
             FileOutputStream outputStream = new FileOutputStream(file);
-            export(data, outputStream, getTemplateStreamByPath(template));
+            export(data, outputStream, me.getTemplateStreamByPath(template));
         } catch (IOException e) {
             throw new ExportException("流异常", e);
         }
@@ -84,7 +86,7 @@ public class POIUtil {
             if (templateFile.exists()) {
                 templateStream = new FileInputStream(templateFile);
             } else {
-                templateStream = POIUtil.class.getResourceAsStream(path);
+                templateStream = ExcelExporter.class.getResourceAsStream(path);
             }
         }
         return templateStream;
@@ -98,10 +100,11 @@ public class POIUtil {
      * @param output   输出流位置
      * @param template 模板输入流
      */
-    public void export(IWorkbook data, OutputStream output, InputStream template) throws ExportException {
+    public static void export(IWorkbook data, OutputStream output, InputStream template) throws ExportException {
         try {
             WorkBookConfig workBookConfig = WorkBookConfigFactory.getWorkbookConfig(data.getClass());
             Workbook workbook = export(data.getWorkbookType(), workBookConfig, data, template);
+            workbook.setForceFormulaRecalculation(true);
             workbook.write(output);
             output.flush();
         } catch (IOException e) {
@@ -117,38 +120,40 @@ public class POIUtil {
      * @param data           被导出的数据
      * @return 工作簿对象
      */
-    public Workbook export(WorkbookType type, WorkBookConfig workBookConfig, Object data, InputStream template) {
+    public static Workbook export(WorkbookType type, WorkBookConfig workBookConfig, Object data, InputStream template) {
         Workbook result = type.getWorkbook(template);
 
         SheetConfig defaultSheetConfig = workBookConfig.getDefaultSheetConfig();
         if (defaultSheetConfig != null) {//默认单元表导出
             String sheetName;
+            //获取默认Sheet 的名字
             if (defaultSheetConfig.getSheetNameFormatter() == null) {
                 sheetName = defaultSheetConfig.getName();
             } else {
-                sheetName = defaultSheetConfig.getSheetNameFormatter().getSheetName(defaultSheetConfig.getName(), 0);
+                sheetName = defaultSheetConfig.getSheetNameFormatter().getSheetName(data, defaultSheetConfig.getName(), 0);
             }
+            //如果没有名字，使用时间戳设置名字
             if (sheetName == null || sheetName.equals("")) {
                 sheetName = String.valueOf(System.currentTimeMillis());
             }
             defaultSheetConfig.setName(sheetName);
             try {
-                writeSheetData(result, null, defaultSheetConfig, data, 0, 0, 0);
+                //写入默认sheet
+                me.writeSheet(result, null, defaultSheetConfig, data, 0, 0);
             } catch (ExportException e) {
                 throw new RuntimeException(data.getClass() + "中的默认单元表导出失败", e);
             }
 
         }
+        //获得引入sheet配置信息
         List<SheetConfig> sheetConfigs = workBookConfig.getSheetConfigs();
         if (sheetConfigs != null) {
             sheetConfigs.forEach((itemSheetConfig) -> {
-                Object itemSheetData = itemSheetConfig.getData(data);
-                if (itemSheetData != null) {//数据为空是，不写入工作表
-                    try {
-                        writeSheetData(result, null, itemSheetConfig, itemSheetData, 0, 0, 0);
-                    } catch (ExportException e) {
-                        throw new RuntimeException("单元表" + itemSheetConfig.getName() + "导出失败", e);
-                    }
+                try {
+                    //循环写入引入sheet
+                    me.writeSheet(result, null, itemSheetConfig, data, 0, 0);
+                } catch (ExportException e) {
+                    throw new RuntimeException("单元表" + itemSheetConfig.getName() + "导出失败", e);
                 }
             });
         }
@@ -157,91 +162,91 @@ public class POIUtil {
     }
 
     /**
-     * 写入工作表数据
+     * 写入工作簿
      *
-     * @param sheet       工作表对象
-     * @param sheetConfig 工作表配置信息
-     * @param data        工作表对应的数据对象
-     * @param loopIndex   循环调用时的索引
+     * @param workbook    工作表
+     * @param sheet       当前配置所对应的工作簿
+     * @param sheetConfig 当前工作簿配置信息
+     * @param source      当前待写入对象
+     * @param rowIv       行修正量
+     * @param colIv       列修正量
      */
-    private void writeSheetData(Workbook workbook, Sheet sheet, SheetConfig sheetConfig, Object data, int rowIv, int colIv, int loopIndex) throws ExportException {
-        Sheet writeDataSheet = null;
-        //判断单元表写入方式，并获取工作表写入对象
+    private void writeSheet(Workbook workbook, Sheet sheet, SheetConfig sheetConfig, Object source, int rowIv, int colIv) {
         if (sheetConfig.getSheetType() == SheetType.INNER) {
-            writeDataSheet = sheet;//内嵌工作表的写入对象为当前工作表
-        } else if (sheetConfig.getSheetType() == SheetType.OUTER) {//外联工作表需新建工作表对象
-            String sheetName;
-            if (sheetConfig.getSheetNameFormatter() != null) {//如果有工作表对象格式化，则使用工作表格式化对象进行工作表名称格式化
-                sheetName = sheetConfig.getSheetNameFormatter().getSheetName(sheetConfig.getName(), loopIndex);
-            } else {
-                sheetName = sheetConfig.getName();
+            //如果是内嵌工作簿，添加行、列修正量
+            rowIv += sheetConfig.getBaseRow();
+            colIv += sheetConfig.getBaseCol();
+        }
+        RepeatConfig repeatConfig = sheetConfig.getRepeatConfig();
+        if (repeatConfig == null) {
+            //非循环写入工作簿
+            Object data = sheetConfig.getData(source);
+            Sheet writeDataSheet = null;
+            //根据工作簿配置创建具体写入工作簿对象
+            if (sheetConfig.getSheetType() == SheetType.INNER) {
+                writeDataSheet = sheet;
+            } else if (sheetConfig.getSheetType() == SheetType.OUTER) {
+                writeDataSheet = getWriteSheet(workbook, sheetConfig, data, 0);
             }
-            writeDataSheet = getSheet(workbook, sheetName);
-            // 新创建 sheet 对象时，重置 rowIv 和 colIv
-            rowIv = colIv = 0;
-        }
-        if (writeDataSheet == null) {
-            throw new ExportException("数据写入工作表创建异常");
-        }
-
-        SheetCellConfig sheetCellConfig = sheetConfig.getSheetCellConfig(); // 获得 工作表 配置信息
-        List<CellConfig> cellConfigs = sheetCellConfig.getCellConfigs();// 获得单元格配置
-        try {
-            for (CellConfig item : cellConfigs) {
-                writeCell(workbook, writeDataSheet, item, data, rowIv, colIv);//写入单元格数据
-            }
-        } catch (ExportException e) {
-            throw new ExportException(writeDataSheet.getSheetName() + "数据写入异常", e);
-        }
-        List<SheetConfig> sheetConfigs = sheetCellConfig.getRefSheetConfigs();//获得关联工作表配置信息
-        if (sheetConfigs == null) {//没有工作表配置信息是，跳出
-            return;
-        }
-        for (SheetConfig itemSheetConfig : sheetConfigs) {
-            // 在一个单元表 中 的 多个单元表配置信息，每次进入新的单元表配置时，该单元表的 rowIv、colIv 应与最初rowIv、colIv 一致
-            int itemSheetRowIv = rowIv;
-            int itemSheetColIv = colIv;
-            if (itemSheetConfig.getSheetType() == SheetType.INNER) {//如果为内嵌工作表，追加 baseRow  baseCol
-                itemSheetRowIv += itemSheetConfig.getBaseRow();
-                itemSheetColIv += itemSheetConfig.getBaseCol();
-            }
-            //判断是否为循环引入
-            RepeatConfig repeatConfig = itemSheetConfig.getRepeatConfig();
-            Object itemSheetData = itemSheetConfig.getData(data);
-            if (itemSheetData != null) {//数据为空时，不写入
-                if (repeatConfig == null) {
-                    //写入工作表
-                    writeSheetData(workbook, writeDataSheet, itemSheetConfig, itemSheetData, itemSheetConfig.getBaseRow() + itemSheetRowIv, itemSheetConfig.getBaseCol() + itemSheetColIv, 0);
-                } else {
-                    Direction direction = repeatConfig.getDirection();
-                    int identity = repeatConfig.getIdentity();
-                    int max = repeatConfig.getMax();
-                    int currentIndex = 0;
-                    if (Iterable.class.isInstance(itemSheetData)) {//检查循环写入数据是否为可迭代
-                        for (Object itemSheetDataItem : ((Iterable) itemSheetData)) {
-                            if (max > 0 && currentIndex >= max) {//最大循环次数判断
-                                break;
-                            }
-                            //写入单个工作表
-                            writeSheetData(workbook, writeDataSheet, itemSheetConfig, itemSheetDataItem, itemSheetRowIv, itemSheetColIv, currentIndex);
-                            //设置循环行列权重
-                            if (direction == Direction.HERIZONTAL) {
-                                itemSheetColIv += identity;
-                            } else if (direction == Direction.VERTICALLY) {
-                                itemSheetRowIv += identity;
-                            } else if (direction == Direction.BOTH) {
-                                itemSheetRowIv += identity;
-                                itemSheetColIv += identity;
-                            }
-                            currentIndex++;
-                        }
-                    } else {
-                        throw new RuntimeException(itemSheetData.getClass().getName() + "不是一个有效的 Iterable 对象");
+            //将数据写入工作簿
+            writeSheet(workbook, writeDataSheet, sheetConfig.getSheetCellConfig(), data, rowIv, colIv);
+        } else {
+            Direction dir = repeatConfig.getDirection();
+            int identity = repeatConfig.getIdentity();
+            int max = repeatConfig.getMax();
+            int currentIndex = 0;
+            Object data = sheetConfig.getData(source);
+            Sheet writeDataSheet = null;
+            //检查数据是否为一个集合类型
+            if (Iterable.class.isInstance(data)) {
+                //迭代循环次数
+                for (Object itemData : ((Iterable) data)) {
+                    if (max > 0 && currentIndex >= max) {//最大循环次数判断
+                        break;
                     }
-
+                    //根据配置配置信息，创建对应工作簿
+                    if (sheetConfig.getSheetType() == SheetType.INNER) {
+                        writeDataSheet = sheet;
+                    } else if (sheetConfig.getSheetType() == SheetType.OUTER) {
+                        writeDataSheet = getWriteSheet(workbook, sheetConfig, itemData, currentIndex);
+                        rowIv = colIv = 0;//外联引入时，重置行、列修正量
+                    }
+                    //写入数据
+                    writeSheet(workbook, writeDataSheet, sheetConfig.getSheetCellConfig(), itemData, rowIv, colIv);
+                    //维护修正量
+                    if (sheetConfig.getSheetType() == SheetType.INNER) {
+                        if (dir == Direction.HERIZONTAL) {
+                            colIv += identity;
+                        } else if (dir == Direction.VERTICALLY) {
+                            rowIv += identity;
+                        } else if (dir == Direction.BOTH) {
+                            rowIv += identity;
+                            colIv += identity;
+                        }
+                    }
+                    currentIndex++;
                 }
             }
         }
+    }
+
+    /**
+     * 写入工作簿数据
+     *
+     * @param workbook        工作表
+     * @param sheet           工作簿
+     * @param sheetCellConfig 工作簿单元格配置信息
+     * @param source          工作簿数据对象
+     * @param rowIv           行修正量
+     * @param colIv           列修正量
+     */
+    private void writeSheet(Workbook workbook, Sheet sheet, SheetCellConfig sheetCellConfig, Object source, int rowIv, int colIv) {
+        sheetCellConfig.getCellConfigs().forEach((cellConfig) -> {//写入单元格
+            writeCell(workbook, sheet, cellConfig, source, rowIv, colIv);
+        });
+        sheetCellConfig.getRefSheetConfigs().forEach((itemConfig) -> {//写入工作簿
+            writeSheet(workbook, sheet, itemConfig, source, rowIv, colIv);
+        });
     }
 
     /**
@@ -328,7 +333,7 @@ public class POIUtil {
                 getCellStyle(cell, workbook).setDataFormat(workbook.createDataFormat().getFormat(formatterPattern));
             }
             if (formatterConfig.getCellDataFormatter() != null) {//如果包含数据格式化方法，执行格式化
-                cellData = formatterConfig.getCellDataFormatter().format(cellData, cell.getRowIndex(), cell.getColumnIndex());
+                cellData = formatterConfig.getCellDataFormatter().format(cellData, cellConfig, rowIv, colIv);
             }
         }
         if (dataType == CellDataType.AUTO) {//根据数据类型，执行不同的数据写入逻辑
@@ -400,66 +405,21 @@ public class POIUtil {
     }
 
     /**
-     * 获取单元格样式，单元格样式找不到时，自动创建新样式，并添加至单元格中
+     * 获取写入配置信息
      *
-     * @param cell     单元对象
-     * @param workbook 工作簿对象
-     * @return 单元格样式对象
+     * @param workbook    工作表
+     * @param sheetConfig 工作簿配置
+     * @param data        工作簿对应数据
+     * @param loopIndex   循环索引
      */
-    private CellStyle getCellStyle(Cell cell, Workbook workbook) {
-        if (cell.getCellStyle() == null) {
-            cell.setCellStyle(workbook.createCellStyle());
+    private Sheet getWriteSheet(Workbook workbook, SheetConfig sheetConfig, Object data, Integer loopIndex) {
+        String sheetName;
+        if (sheetConfig.getSheetNameFormatter() != null) {//如果有工作表对象格式化，则使用工作表格式化对象进行工作表名称格式化
+            sheetName = sheetConfig.getSheetNameFormatter().getSheetName(data, sheetConfig.getName(), loopIndex);
+        } else {
+            sheetName = sheetConfig.getName();
         }
-        return cell.getCellStyle();
-    }
-
-
-    /**
-     * 获得合并单元格
-     *
-     * @param sheet    工作表对象
-     * @param startRow 合并开始行
-     * @param startCol 合并开始列
-     * @param endRow   合并结束行
-     * @param endCol   合并结束列
-     * @return 单元格对象
-     */
-    private Cell getMergedCell(Sheet sheet, int startRow, int startCol, int endRow, int endCol) {
-        sheet.addMergedRegion(new CellRangeAddress(startRow, endRow, startCol, endCol));
-        return getCell(getRow(sheet, startRow), startCol);
-    }
-
-    /**
-     * 获取工作簿中的工作表
-     *
-     * @param workbook  工作簿对象
-     * @param sheetName 工作表名称
-     * @return 工作表对象
-     */
-    private Sheet getSheet(Workbook workbook, String sheetName) {
-        return workbook.getSheet(sheetName) == null ? workbook.createSheet(sheetName) : workbook.getSheet(sheetName);
-    }
-
-    /**
-     * 获取工作表中的行
-     *
-     * @param sheet    工作表
-     * @param rowIndex 行坐标
-     * @return 行对象
-     */
-    private Row getRow(Sheet sheet, int rowIndex) {
-        return sheet.getRow(rowIndex) == null ? sheet.createRow(rowIndex) : sheet.getRow(rowIndex);
-    }
-
-    /**
-     * 获取单元格对象
-     *
-     * @param row       单元格所在行
-     * @param cellIndex 单元格纵坐标
-     * @return 单元格对象
-     */
-    private Cell getCell(Row row, int cellIndex) {
-        return row.getCell(cellIndex) == null ? row.createCell(cellIndex) : row.getCell(cellIndex);
+        return getSheet(workbook, sheetName);
     }
 
 
