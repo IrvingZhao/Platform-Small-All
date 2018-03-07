@@ -8,6 +8,9 @@ import demo.FormulaRepeatDataFormater;
  */
 public class Entity3 {
 
+    public Entity3() {
+    }
+
     public Entity3(int intA, int intB, String sum) {
         this.intA = intA;
         this.intB = intB;

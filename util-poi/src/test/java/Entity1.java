@@ -26,15 +26,15 @@ public class Entity1 {
     private List<String> s3;
 
     @Sheet(type = SheetType.INNER, baseCol = 6, baseRow = 0)
-    @Repeatable(direction = Direction.VERTICALLY, identity = 8)
+    @Repeatable(direction = Direction.VERTICALLY, identity = 8, itemType = Entity2.class)
     private List<Entity2> entity2List;
 
     @Sheet(type = SheetType.OUTER, name = "引入外部", nameFormatter = DemoNameFormatter.class)
-    @Repeatable
+    @Repeatable(itemType = Entity2.class)
     private List<Entity2> entity2;
 
     @Sheet(type = SheetType.INNER, baseRow = 20, baseCol = 0)
-    @Repeatable(direction = Direction.VERTICALLY, identity = 2)
+    @Repeatable(direction = Direction.VERTICALLY, identity = 2, itemType = Entity3.class)
     private List<Entity3> entity3s;
 
 

@@ -1,6 +1,9 @@
-import cn.irving.zhao.util.poi.POIUtil;
+import cn.irving.zhao.util.poi.ExcelExporter;
+import cn.irving.zhao.util.poi.ExcelImporter;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 
-import java.lang.reflect.ParameterizedType;
+import java.io.File;
 import java.util.Arrays;
 
 public class Main<T, A> {
@@ -11,7 +14,7 @@ public class Main<T, A> {
 //        entity.setvListStr(Arrays.asList("v1", "v2", "v3", "v4", "v5"));
 //        entity.setRegion("region");
 //        entity.setMergeds(Arrays.asList("re1", "re2", "re3", "re4", "re5"));
-////        new POIUtil().writeExcel(entity, "E:\\basepath\\a.xlsx", OutputType.XLSX);
+////        new ExcelExporter().writeExcel(entity, "E:\\basepath\\a.xlsx", OutputType.XLSX);
 //
 //        System.out.println(entity.getClass().getAnnotation(Sheet.class).name());
 //        System.out.println(Entity2.class.getAnnotation(Sheet.class).name());
@@ -71,12 +74,12 @@ public class Main<T, A> {
 //        demoWorkbook.setSheet1(sheet1);
 //        demoWorkbook.setSheet2(sheet2);
 //        long time = System.currentTimeMillis();
-//        new POIUtil().writeExcel(demoWorkbook, "E:\\basepath\\a.xlsx", OutputType.XLSX);
+//        new ExcelExporter().writeExcel(demoWorkbook, "E:\\basepath\\a.xlsx", OutputType.XLSX);
 //        System.out.println("time1：" + (System.currentTimeMillis() - time));
 //
 //        time = System.currentTimeMillis();
 //
-//        new POIUtil().writeExcel(demoWorkbook, "E:\\basepath\\b.xlsx", OutputType.XLSX);
+//        new ExcelExporter().writeExcel(demoWorkbook, "E:\\basepath\\b.xlsx", OutputType.XLSX);
 //        System.out.println("time2：" + (System.currentTimeMillis() - time));
 
 //        int rowIv = 1;
@@ -135,14 +138,19 @@ public class Main<T, A> {
         e2_1.setS3(Arrays.asList("entity-2-1-s3-1", "entity-2-1-s3-2", "entity-2-1-s3-3"));
         workbookContainer.setEntity2(e2_1);
 
-
-        POIUtil poiUtil = new POIUtil();
+        workbookContainer.setEntity2s(e1_1.getEntity2());
+        workbookContainer.setEntity3s(e1_1.getEntity3s());
 
         long time = System.currentTimeMillis();
-        poiUtil.export(workbookContainer, "D:\\basepath\\a.xlsx", "");
-        System.out.println(System.currentTimeMillis() - time);
+//        ExcelExporter.export(workbookContainer, "D:\\basepath\\a.xlsx", "");
+//        System.out.println(System.currentTimeMillis() - time);
+//        time = System.currentTimeMillis();
+//        ExcelExporter.export(workbookContainer, "D:\\basepath\\b.xlsx", "");
+//        System.out.println(System.currentTimeMillis() - time);
+
         time = System.currentTimeMillis();
-        poiUtil.export(workbookContainer, "D:\\basepath\\b.xlsx", "");
+        Workbook workbook = WorkbookFactory.create(new File("d:\\basepath\\a.xlsx"));
+        WorkbookContainer result = ExcelImporter.imports(WorkbookContainer.class, workbook);
         System.out.println(System.currentTimeMillis() - time);
     }
 

@@ -5,7 +5,9 @@ import cn.irving.zhao.util.poi.annonation.Sheet;
 import cn.irving.zhao.util.poi.enums.Direction;
 import cn.irving.zhao.util.poi.enums.SheetType;
 import cn.irving.zhao.util.poi.inter.IWorkbook;
+import demo.DemoNameFormatter;
 
+import java.awt.*;
 import java.util.List;
 
 /**
@@ -30,6 +32,15 @@ public class WorkbookContainer implements IWorkbook {
 
     @Sheet(type = SheetType.INNER)
     private Entity2 entity2;
+
+    @Sheet(type = SheetType.OUTER, name = "引入外部A", nameFormatter = DemoNameFormatter.class)
+    @Repeatable(itemType = Entity2.class)
+    private List<Entity2> entity2s;
+
+    @Sheet(type = SheetType.INNER, baseRow = 20, baseCol = 0)
+    @Repeatable(direction = Direction.VERTICALLY, identity = 2, itemType = Entity3.class)
+    private List<Entity3> entity3s;
+
 
     public Entity1 getEntity1() {
         return entity1;
@@ -69,5 +80,23 @@ public class WorkbookContainer implements IWorkbook {
 
     public void setEntity2(Entity2 entity2) {
         this.entity2 = entity2;
+    }
+
+    public List<Entity2> getEntity2s() {
+        return entity2s;
+    }
+
+    public WorkbookContainer setEntity2s(List<Entity2> entity2s) {
+        this.entity2s = entity2s;
+        return this;
+    }
+
+    public List<Entity3> getEntity3s() {
+        return entity3s;
+    }
+
+    public WorkbookContainer setEntity3s(List<Entity3> entity3s) {
+        this.entity3s = entity3s;
+        return this;
     }
 }
