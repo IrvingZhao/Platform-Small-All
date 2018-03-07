@@ -3,12 +3,12 @@
 #### 使用方式
 
 1. 创建Workbook对象，Workbook对象需实现 `cn.irving.zhao.util.poi.inter.IWorkbook` 接口，可选择性覆盖 `getWorkbookType` 方法，默认为 `XLSX` 模式
-2. 创建 `cn.irving.zhao.util.poi.POIUtil` 实例，并调用 `export` 方法，传入 Workbook对象，输出流，模板文件等内容
+2. 创建 `cn.irving.zhao.util.poi.ExcelExporter` 实例，并调用 `export` 方法，传入 Workbook对象，输出流，模板文件等内容
 
 ```java
 WorkbookContainer workbookContainer = new WorkbookContainer();
-POIUtil poiUtil = new POIUtil();
-poiUtil.export(workbookContainer, "D:\\basepath\\a.xlsx", "");
+ExcelExporter excelExporter = new ExcelExporter();
+excelExporter.export(workbookContainer, "D:\\basepath\\a.xlsx", "");
 ```
 
 #### 配置详解
@@ -202,8 +202,8 @@ e2_1.setS3(Arrays.asList("entity-2-1-s3-1", "entity-2-1-s3-2", "entity-2-1-s3-3"
 workbookContainer.setEntity2(e2_1);
 
 
-POIUtil poiUtil = new POIUtil();
+ExcelExporter excelExporter = new ExcelExporter();
 
-poiUtil.export(workbookContainer, "输出目录", "");
+excelExporter.export(workbookContainer, "输出目录", "");
 ```
 
