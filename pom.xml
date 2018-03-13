@@ -15,6 +15,8 @@
         <module>util-poi</module>
         <module>util-remote-http</module>
         <module>util-remote-mina</module>
+        <module>util-remote-weixin-base</module>
+        <module>util-remote-weixin-mp</module>
         <module>util-shiro</module>
         <!--<module>web-test</module>-->
         <module>web-spring-boot</module>
