@@ -1,5 +1,8 @@
 package cn.irving.zhao.platform.weixin.mp;
 
+import cn.irving.zhao.platform.weixin.base.message.send.BaseSendInputMessage;
+import cn.irving.zhao.platform.weixin.base.message.send.BaseSendOutputMessage;
+import cn.irving.zhao.platform.weixin.base.message.send.MessageSender;
 import cn.irving.zhao.platform.weixin.mp.config.WeChartConfigManager;
 import cn.irving.zhao.platform.weixin.mp.config.impl.DefaultWeChartConfigManager;
 import cn.irving.zhao.platform.weixin.mp.token.AccessTokenManager;
@@ -27,6 +30,8 @@ public final class WeChartMpClient {
      * 微信配置文件
      */
     private String propertyPath = "/conf/wx.client.properties";
+
+    private static final MessageSender messageSender = new MessageSender();
 
     private AccessTokenManager tokenManager;
     private WeChartConfigManager configManager;
@@ -112,8 +117,8 @@ public final class WeChartMpClient {
         }
     }
 
-    public static void sendMessage() {
-        //TODO SendMessage
+    public static <T extends BaseSendInputMessage> T sendMessage(BaseSendOutputMessage<T> outputMessage) {
+        return messageSender.sendMessage(outputMessage);
     }
 
     public String getPropertyPath() {
