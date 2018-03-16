@@ -30,11 +30,4 @@ public interface AccessTokenManager {
      */
     String getToken(String name);
 
-    /**
-     * 设置指定name的token
-     *
-     * @param name  配置的name值
-     * @param token token值
-     */
-    void setToken(String name, String token);
 }
