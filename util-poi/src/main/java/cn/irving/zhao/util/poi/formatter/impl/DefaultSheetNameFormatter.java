@@ -4,9 +4,9 @@ import cn.irving.zhao.util.poi.config.SheetConfig;
 import cn.irving.zhao.util.poi.formatter.SheetNameFormatter;
 
 /**
- * @author zhaojn1
- * @version DefaultSheetNameFormatter.java, v 0.1 2018/3/6 zhaojn1
- * @project userProfile
+ * 默认Sheet名称格式化对象
+ *
+ * @author Irving Zhao
  */
 public class DefaultSheetNameFormatter implements SheetNameFormatter {
     @Override
