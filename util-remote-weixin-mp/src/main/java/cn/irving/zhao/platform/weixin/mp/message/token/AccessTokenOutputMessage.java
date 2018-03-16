@@ -5,9 +5,9 @@ import cn.irving.zhao.platform.weixin.base.message.send.BaseSendOutputMessage;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * @author zhaojn1
- * @version AccessTokenOutputMessage.java, v 0.1 2018/3/14 zhaojn1
- * @project userProfile
+ * 微信 AccessToken 获取消息 - 请求消息
+ *
+ * @author Irving Zhao
  */
 @WeChartMessage
 public class AccessTokenOutputMessage extends BaseSendOutputMessage<AccessTokenInputMessage> {

@@ -4,9 +4,9 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
- * @author zhaojn1
- * @version AccessTokenInfo.java, v 0.1 2018/3/15 zhaojn1
- * @project userProfile
+ * Token 信息存放类
+ *
+ * @author Irving Zhao
  */
 public class AccessTokenInfo {
 
