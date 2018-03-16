@@ -9,5 +9,5 @@ import cn.irving.zhao.platform.weixin.base.message.BaseInputMessage;
  * @version 1.0
  * @since 1.0
  */
-public abstract class BaseSendInputMessage<T extends BaseSendOutputMessage> extends BaseInputMessage<T> {
+public abstract class BaseSendInputMessage extends BaseInputMessage {
 }

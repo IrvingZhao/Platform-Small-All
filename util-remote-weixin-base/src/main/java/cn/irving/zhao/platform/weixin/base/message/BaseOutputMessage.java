@@ -13,10 +13,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * @version 1.0
  * @since 1.0
  */
-public abstract class BaseOutputMessage<T extends BaseInputMessage> extends BaseMessage {
-
-    @JsonIgnore
-    public abstract Class<T> getInputMessageClass();
+public abstract class BaseOutputMessage extends BaseMessage {
 
     private final WeChartMessageConfig messageConfig;
 

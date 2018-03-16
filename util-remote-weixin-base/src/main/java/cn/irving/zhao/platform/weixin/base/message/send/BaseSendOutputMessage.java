@@ -1,6 +1,7 @@
 package cn.irving.zhao.platform.weixin.base.message.send;
 
 import cn.irving.zhao.platform.weixin.base.message.BaseOutputMessage;
+import cn.irving.zhao.util.base.serial.ObjectStringSerialUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.beans.BeanInfo;
@@ -18,28 +19,15 @@ import java.util.Map;
  * @version 1.0
  * @since 1.0
  */
-public abstract class BaseSendOutputMessage<T extends BaseSendInputMessage> extends BaseOutputMessage<T> {
+public abstract class BaseSendOutputMessage<T extends BaseSendInputMessage> extends BaseOutputMessage {
     @JsonIgnore
     public abstract String getUrl();
 
     @JsonIgnore
-    final Map<String, Object> getParamMap() {
-        Map<String, Object> result = null;
-        try {
-            BeanInfo beanInfo = Introspector.getBeanInfo(this.getClass(), BaseSendOutputMessage.class);
+    public abstract Class<T> getInputMessageClass();
 
-            PropertyDescriptor[] descriptors = beanInfo.getPropertyDescriptors();
-            result = new HashMap<>(descriptors.length);
-            for (PropertyDescriptor item : descriptors) {
-                String name = item.getName();
-                if (name.equals("url") || name.equals("inputMessageClass")) {
-                    continue;
-                }
-                result.put(name, item.getReadMethod().invoke(this));
-            }
-        } catch (IntrospectionException | InvocationTargetException | IllegalAccessException e) {
-            e.printStackTrace();
-        }
-        return result;
+    @JsonIgnore
+    final Map<String, Object> getParamMap() {
+        return serialUtil.parse(serialUtil.serial(this, ObjectStringSerialUtil.SerialType.JSON), ObjectStringSerialUtil.SerialType.JSON);
     }
 }
