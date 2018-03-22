@@ -4,6 +4,7 @@ import cn.irving.zhao.util.remote.http.config.ClientConfig;
 import cn.irving.zhao.util.remote.http.enums.HttpMethod;
 import cn.irving.zhao.util.remote.http.enums.RequestType;
 import cn.irving.zhao.util.remote.http.message.HttpMessage;
+import cn.irving.zhao.util.remote.http.util.ContentTypeUtil;
 import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
 import org.apache.hc.client5.http.entity.mime.MultipartEntityBuilder;
 import org.apache.hc.client5.http.impl.sync.CloseableHttpClient;
@@ -24,7 +25,6 @@ import org.apache.hc.core5.http.entity.InputStreamEntity;
 import org.apache.hc.core5.http.message.BasicNameValuePair;
 import org.apache.hc.core5.ssl.SSLContexts;
 
-import javax.activation.MimetypesFileTypeMap;
 import javax.net.ssl.SSLContext;
 import java.io.File;
 import java.io.FileInputStream;
@@ -53,7 +53,6 @@ public class HttpClient {
 
     private CloseableHttpClient client;
     private ClientConfig config;
-    private MimetypesFileTypeMap mimetypesFileTypeMap = new MimetypesFileTypeMap();
     private Charset charset;
 
     public HttpClient() {
@@ -94,7 +93,7 @@ public class HttpClient {
         try {
             HttpUriRequest request;
             HttpEntity entity = generateHttpEntity(message);
-            String requestUrl=message.getRequestUrl();
+            String requestUrl = message.getRequestUrl();
             if (message.getRequestMethod() == HttpMethod.GET) {
                 try {
                     String paramStr = EntityUtils.toString(entity, charset);
@@ -153,7 +152,8 @@ public class HttpClient {
                 return;
             }
             if (File.class.isAssignableFrom(value.getClass())) {
-                entityBuilder.addBinaryBody(item.getKey(), (File) value, ContentType.create(mimetypesFileTypeMap.getContentType((File) value)), ((File) value).getName());
+                String fileName = ((File) value).getName();
+                entityBuilder.addBinaryBody(item.getKey(), (File) value, ContentTypeUtil.getContentType(fileName), fileName);
             } else if (InputStream.class.isAssignableFrom(value.getClass())) {
                 entityBuilder.addBinaryBody(item.getKey(), (InputStream) value);
             } else if (String.class.isAssignableFrom(value.getClass())) {
