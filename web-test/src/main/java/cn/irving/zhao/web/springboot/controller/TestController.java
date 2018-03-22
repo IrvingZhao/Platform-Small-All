@@ -1,7 +1,7 @@
-package cn.irving.zhao.web.controller;
+package cn.irving.zhao.web.springboot.controller;
 
-import cn.irving.zhao.web.entity.AuthMenu;
-import cn.irving.zhao.web.service.AuthMenuService;
+import cn.irving.zhao.web.springboot.entity.AuthMenu;
+import cn.irving.zhao.web.springboot.service.AuthMenuService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;

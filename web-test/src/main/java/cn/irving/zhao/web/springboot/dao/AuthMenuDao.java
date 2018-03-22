@@ -1,8 +1,8 @@
-package cn.irving.zhao.web.dao;
+package cn.irving.zhao.web.springboot.dao;
 
 import cn.irving.zhao.platform.core.dao.impl.BaseDao;
-import cn.irving.zhao.web.entity.AuthMenu;
-import cn.irving.zhao.web.mapper.AuthMenuMapper;
+import cn.irving.zhao.web.springboot.entity.AuthMenu;
+import cn.irving.zhao.web.springboot.mapper.AuthMenuMapper;
 import org.springframework.stereotype.Repository;
 
 /**

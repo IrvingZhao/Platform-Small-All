@@ -1,9 +1,8 @@
-package cn.irving.zhao.web.service;
+package cn.irving.zhao.web.springboot.service;
 
-import cn.irving.zhao.web.dao.AuthMenuDao;
-import cn.irving.zhao.web.entity.AuthMenu;
+import cn.irving.zhao.web.springboot.dao.AuthMenuDao;
+import cn.irving.zhao.web.springboot.entity.AuthMenu;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.List;

@@ -1,4 +1,4 @@
-package cn.irving.zhao.web.entity;
+package cn.irving.zhao.web.springboot.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

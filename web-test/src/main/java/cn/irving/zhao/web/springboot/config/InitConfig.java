@@ -1,4 +1,4 @@
-package cn.irving.zhao.web.config;
+package cn.irving.zhao.web.springboot.config;
 
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;

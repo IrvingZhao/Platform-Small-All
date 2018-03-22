@@ -1,6 +1,6 @@
-package cn.irving.zhao.web.startup;
+package cn.irving.zhao.web.springboot.startup;
 
-import cn.irving.zhao.web.config.InitConfig;
+import cn.irving.zhao.web.springboot.config.InitConfig;
 import org.springframework.web.WebApplicationInitializer;
 import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
