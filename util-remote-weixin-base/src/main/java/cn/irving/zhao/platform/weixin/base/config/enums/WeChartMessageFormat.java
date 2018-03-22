@@ -8,5 +8,5 @@ package cn.irving.zhao.platform.weixin.base.config.enums;
  * @since 1.0
  */
 public enum WeChartMessageFormat {
-    FORM, JSON, XML;
+    FORM, JSON, XML, MULTIPART;
 }

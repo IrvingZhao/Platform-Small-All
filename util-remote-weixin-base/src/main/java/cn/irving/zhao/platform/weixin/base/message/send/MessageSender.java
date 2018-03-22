@@ -61,8 +61,10 @@ public class MessageSender {
             switch (messageConfig.getRequestMethod()) {
                 case POST:
                     this.httpMethod = HttpMethod.POST;
+                    break;
                 case GET:
                     this.httpMethod = HttpMethod.GET;
+                    break;
             }
             WeChartMessageFormat requestFormat = messageConfig.getRequestType();
             switch (requestFormat) {
@@ -75,6 +77,9 @@ public class MessageSender {
                 case JSON:
                     this.requestStream = new ByteArrayInputStream(serialUtil.serial(outputMessage, ObjectStringSerialUtil.SerialType.JSON).getBytes());
                     break;
+                case MULTIPART:
+                    this.requestType = RequestType.MULTIPART;
+                    this.requestParams = outputMessage.getParamMap();
             }
         }
 
