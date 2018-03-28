@@ -8,7 +8,6 @@ import cn.irving.zhao.util.remote.http.enums.HttpMethod;
 import cn.irving.zhao.util.remote.http.enums.RequestType;
 import cn.irving.zhao.util.remote.http.message.HttpMessage;
 
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Map;
 
@@ -50,9 +49,10 @@ public class MessageSender {
         private HttpMethod httpMethod = HttpMethod.GET;
         private RequestType requestType = RequestType.NORMAL;
         private Map<String, Object> requestParams;
-        private InputStream requestStream;
         private int resultCode;
         private InputStream responseStream;
+
+        private String requestString;
 
 
         BaseHttpMessage(BaseSendOutputMessage outputMessage) {
@@ -72,15 +72,22 @@ public class MessageSender {
                     this.requestParams = outputMessage.getParamMap();
                     break;
                 case XML:
-                    this.requestStream = new ByteArrayInputStream(serialUtil.serial(outputMessage, ObjectStringSerialUtil.SerialType.XML).getBytes());
+                    this.requestType = RequestType.STRING;
+                    this.requestString = serialUtil.serial(outputMessage, ObjectStringSerialUtil.SerialType.XML);
                     break;
                 case JSON:
-                    this.requestStream = new ByteArrayInputStream(serialUtil.serial(outputMessage, ObjectStringSerialUtil.SerialType.JSON).getBytes());
+                    this.requestType = RequestType.STRING;
+                    this.requestString = serialUtil.serial(outputMessage, ObjectStringSerialUtil.SerialType.JSON);
                     break;
                 case MULTIPART:
                     this.requestType = RequestType.MULTIPART;
                     this.requestParams = outputMessage.getParamMap();
             }
+        }
+
+        @Override
+        public String getRequestBodyString() {
+            return requestString;
         }
 
         @Override
@@ -101,11 +108,6 @@ public class MessageSender {
         @Override
         public Map<String, Object> getRequestParams() {
             return requestParams;
-        }
-
-        @Override
-        public InputStream getRequestStream() {
-            return requestStream;
         }
 
         @Override
