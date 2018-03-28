@@ -38,6 +38,10 @@ public final class WeChartMpClient {
 
     private static final WeChartMpClient me = new WeChartMpClient();
 
+    static {
+        me.init();
+    }
+
     private AccessTokenManager tokenManager;
     private WeChartConfigManager configManager;
 

@@ -1,11 +1,16 @@
 package cn.irving.zhao.platform.weixin.mp.message.send.template;
 
+import cn.irving.zhao.platform.weixin.base.config.enums.WeChartMessageFormat;
+import cn.irving.zhao.platform.weixin.base.config.enums.WeChartMessageRequestMethod;
+import cn.irving.zhao.platform.weixin.base.config.message.WeChartMessage;
 import cn.irving.zhao.platform.weixin.mp.message.send.BaseMpSendOutputMessage;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@WeChartMessage(requestMethod = WeChartMessageRequestMethod.POST,
+        requestType = WeChartMessageFormat.JSON)
 public class SendTemplateOutputMessage extends BaseMpSendOutputMessage<SendTemplateInputMessage> {
 
     private static final String requestUrl = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=%s";
@@ -14,7 +19,8 @@ public class SendTemplateOutputMessage extends BaseMpSendOutputMessage<SendTempl
     private String toUser;
     @JsonProperty("template_id")
     private String templateId;
-    private String url;
+    @JsonProperty("url")
+    private String redirectUrl;
     @JsonProperty("miniprogram")
     private MiniProgramConfig miniProgramConfig;
     private Map<String, Map<String, String>> data;
@@ -66,10 +72,6 @@ public class SendTemplateOutputMessage extends BaseMpSendOutputMessage<SendTempl
         this.templateId = templateId;
     }
 
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
     public MiniProgramConfig getMiniProgramConfig() {
         return miniProgramConfig;
     }
@@ -84,5 +86,13 @@ public class SendTemplateOutputMessage extends BaseMpSendOutputMessage<SendTempl
 
     public void setData(Map<String, Map<String, String>> data) {
         this.data = data;
+    }
+
+    public String getRedirectUrl() {
+        return redirectUrl;
+    }
+
+    public void setRedirectUrl(String redirectUrl) {
+        this.redirectUrl = redirectUrl;
     }
 }
