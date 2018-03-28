@@ -68,25 +68,38 @@ public interface HttpMessage {
         return new ByteArrayInputStream(new byte[]{});
     }
 
+    default String getRequestBodyString() {
+        return "";
+    }
+
     /**
      * 设置响应代码
      *
      * @param code 响应代码
      */
-    default void setResponseCode(int code){};
+    default void setResponseCode(int code) {
+    }
+
+    ;
 
     /**
      * 设置响应头
      *
      * @param head 响应头
      */
-    default void setResponseHead(Map<String, String> head){};
+    default void setResponseHead(Map<String, String> head) {
+    }
+
+    ;
 
     /**
      * 设置响应流
      *
      * @param inputStream 相应流
      */
-    default void setResponseStream(InputStream inputStream){};
+    default void setResponseStream(InputStream inputStream) {
+    }
+
+    ;
 
 }

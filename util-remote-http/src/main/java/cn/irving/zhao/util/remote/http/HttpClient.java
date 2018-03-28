@@ -22,6 +22,7 @@ import org.apache.hc.core5.http.ParseException;
 import org.apache.hc.core5.http.entity.ContentType;
 import org.apache.hc.core5.http.entity.EntityUtils;
 import org.apache.hc.core5.http.entity.InputStreamEntity;
+import org.apache.hc.core5.http.entity.StringEntity;
 import org.apache.hc.core5.http.message.BasicNameValuePair;
 import org.apache.hc.core5.ssl.SSLContexts;
 
@@ -136,6 +137,8 @@ public class HttpClient {
             result = buildMultipartEntity(message.getRequestParams());
         } else if (type == RequestType.STREAM) {
             result = buildStreamEntity(message.getRequestStream());
+        } else if (type == RequestType.STRING) {
+            result = new StringEntity(message.getRequestBodyString(), ContentType.APPLICATION_JSON);
         }
         return result;
     }
@@ -178,7 +181,7 @@ public class HttpClient {
      * 构建流请求体
      */
     private InputStreamEntity buildStreamEntity(InputStream stream) {
-        return new InputStreamEntity(stream, ContentType.create("application/octet-stream", charset));
+        return new InputStreamEntity(stream, ContentType.create("application/json", charset));
     }
 
     /**
