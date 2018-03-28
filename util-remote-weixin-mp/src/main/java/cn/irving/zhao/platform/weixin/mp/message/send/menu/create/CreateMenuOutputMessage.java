@@ -13,10 +13,6 @@ public class CreateMenuOutputMessage extends BaseMpSendOutputMessage<CreateMenuI
 
     private List<Button> button;
 
-    public CreateMenuOutputMessage(String token) {
-        super(token);
-    }
-
     public CreateMenuOutputMessage addButton(Button button) {
         if (this.button == null) {
             synchronized (this) {

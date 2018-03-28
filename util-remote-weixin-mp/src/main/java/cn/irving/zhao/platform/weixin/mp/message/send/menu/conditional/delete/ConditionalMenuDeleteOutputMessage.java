@@ -12,10 +12,6 @@ public class ConditionalMenuDeleteOutputMessage extends BaseMpSendOutputMessage<
     private String menuId;
 
 
-    protected ConditionalMenuDeleteOutputMessage(String token) {
-        super(token);
-    }
-
     @Override
     public Class<ConditionalMenuDeleteInputMessage> getInputMessageClass() {
         return ConditionalMenuDeleteInputMessage.class;

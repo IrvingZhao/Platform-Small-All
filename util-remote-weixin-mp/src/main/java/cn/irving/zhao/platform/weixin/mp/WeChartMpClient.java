@@ -5,6 +5,7 @@ import cn.irving.zhao.platform.weixin.base.message.send.BaseSendOutputMessage;
 import cn.irving.zhao.platform.weixin.base.message.send.MessageSender;
 import cn.irving.zhao.platform.weixin.mp.config.WeChartConfigManager;
 import cn.irving.zhao.platform.weixin.mp.config.impl.DefaultWeChartConfigManager;
+import cn.irving.zhao.platform.weixin.mp.message.send.BaseMpSendOutputMessage;
 import cn.irving.zhao.platform.weixin.mp.token.AccessTokenManager;
 import cn.irving.zhao.platform.weixin.mp.token.impl.DefaultAccessTokenManager;
 import org.slf4j.Logger;
@@ -25,6 +26,8 @@ import java.util.Properties;
 public final class WeChartMpClient {
     //TODO 添加  transient static 配置区域
 
+    public static final String DEFAULT_NAME = "default";
+
     private Logger logger = LoggerFactory.getLogger(WeChartMpClient.class);
     /**
      * 微信配置文件
@@ -32,6 +35,8 @@ public final class WeChartMpClient {
     private String propertyPath = "/conf/wx.client.properties";
 
     private static final MessageSender messageSender = new MessageSender();
+
+    private static final WeChartMpClient me = new WeChartMpClient();
 
     private AccessTokenManager tokenManager;
     private WeChartConfigManager configManager;
@@ -118,6 +123,14 @@ public final class WeChartMpClient {
     }
 
     public static <T extends BaseSendInputMessage> T sendMessage(BaseSendOutputMessage<T> outputMessage) {
+        return sendMessage(DEFAULT_NAME, outputMessage);
+    }
+
+    public static <T extends BaseSendInputMessage> T sendMessage(String configName, BaseSendOutputMessage<T> outputMessage) {
+        if (BaseMpSendOutputMessage.class.isInstance(outputMessage)) {
+            String token = me.tokenManager.getToken(configName);
+            ((BaseMpSendOutputMessage) outputMessage).setAccessToken(token);
+        }
         return messageSender.sendMessage(outputMessage);
     }
 

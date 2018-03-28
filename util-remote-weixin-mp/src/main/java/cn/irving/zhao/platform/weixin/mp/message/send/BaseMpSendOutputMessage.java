@@ -12,8 +12,11 @@ public abstract class BaseMpSendOutputMessage<T extends BaseMpSendInputMessage> 
     @JsonIgnore
     protected String accessToken;
 
-    protected BaseMpSendOutputMessage(String token) {
-        this.accessToken = token;
+    public String getAccessToken() {
+        return accessToken;
     }
 
+    public void setAccessToken(String accessToken) {
+        this.accessToken = accessToken;
+    }
 }

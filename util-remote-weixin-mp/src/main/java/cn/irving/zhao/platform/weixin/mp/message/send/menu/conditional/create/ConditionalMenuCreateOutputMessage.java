@@ -19,10 +19,6 @@ public class ConditionalMenuCreateOutputMessage extends BaseMpSendOutputMessage<
     @JsonProperty("matchrule")
     private MatchRule matchRule;
 
-    protected ConditionalMenuCreateOutputMessage(String token) {
-        super(token);
-    }
-
     public ConditionalMenuCreateOutputMessage addButton(Button button) {
         if (this.buttons == null) {
             synchronized (this) {

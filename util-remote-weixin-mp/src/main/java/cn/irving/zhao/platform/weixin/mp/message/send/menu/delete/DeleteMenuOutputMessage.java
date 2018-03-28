@@ -7,10 +7,6 @@ import cn.irving.zhao.platform.weixin.mp.message.send.BaseMpSendOutputMessage;
  */
 public class DeleteMenuOutputMessage extends BaseMpSendOutputMessage<DeleteMenuInputMessage> {
 
-    protected DeleteMenuOutputMessage(String token) {
-        super(token);
-    }
-
     @Override
     public Class<DeleteMenuInputMessage> getInputMessageClass() {
         return DeleteMenuInputMessage.class;

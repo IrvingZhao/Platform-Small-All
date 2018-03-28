@@ -7,10 +7,6 @@ import cn.irving.zhao.platform.weixin.mp.message.send.BaseMpSendOutputMessage;
  */
 public class SearchMenuOutputMessage extends BaseMpSendOutputMessage<SearchMenuInputMessage> {
 
-    public SearchMenuOutputMessage(String token) {
-        super(token);
-    }
-
     @Override
     public Class<SearchMenuInputMessage> getInputMessageClass() {
         return SearchMenuInputMessage.class;

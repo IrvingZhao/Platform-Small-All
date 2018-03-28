@@ -23,10 +23,6 @@ public class AddTempMaterialOutputMessage extends BaseMpSendOutputMessage<AddTem
 
     private File media;
 
-    public AddTempMaterialOutputMessage(String token) {
-        super(token);
-    }
-
     @Override
     public String getUrl() {
         return String.format(REQUEST_URL, accessToken, type);
