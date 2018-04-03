@@ -38,10 +38,6 @@ public final class WeChartMpClient {
 
     private static final WeChartMpClient me = new WeChartMpClient();
 
-    static {
-        me.init();
-    }
-
     private AccessTokenManager tokenManager;
     private WeChartConfigManager configManager;
 
@@ -55,7 +51,7 @@ public final class WeChartMpClient {
      * <p>初始化微信账户管理器、token管理器</p>
      * <p>当账户管理器或token管理器为null时，采用配置文件形式进行账户管理器与token管理器实例化</p>
      */
-    public void init() {
+    public synchronized void init() {
         if (this.configManager == null || this.tokenManager == null) {
             loadProperties();
         }

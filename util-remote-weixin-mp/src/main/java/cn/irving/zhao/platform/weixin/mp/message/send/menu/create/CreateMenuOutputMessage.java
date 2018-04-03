@@ -1,5 +1,8 @@
 package cn.irving.zhao.platform.weixin.mp.message.send.menu.create;
 
+import cn.irving.zhao.platform.weixin.base.config.enums.WeChartMessageFormat;
+import cn.irving.zhao.platform.weixin.base.config.enums.WeChartMessageRequestMethod;
+import cn.irving.zhao.platform.weixin.base.config.message.WeChartMessage;
 import cn.irving.zhao.platform.weixin.mp.message.send.BaseMpSendOutputMessage;
 import cn.irving.zhao.platform.weixin.mp.message.send.menu.entity.Button;
 
@@ -9,6 +12,7 @@ import java.util.List;
 /**
  * 创建菜单输出消息
  */
+@WeChartMessage(requestMethod = WeChartMessageRequestMethod.POST, requestType = WeChartMessageFormat.JSON)
 public class CreateMenuOutputMessage extends BaseMpSendOutputMessage<CreateMenuInputMessage> {
 
     private List<Button> button;

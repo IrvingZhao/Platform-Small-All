@@ -7,6 +7,8 @@ import cn.irving.zhao.platform.weixin.mp.config.WeChartMpConfig;
 import cn.irving.zhao.platform.weixin.mp.message.send.token.AccessTokenInputMessage;
 import cn.irving.zhao.platform.weixin.mp.message.send.token.AccessTokenOutputMessage;
 import cn.irving.zhao.platform.weixin.mp.token.AccessTokenManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.Timer;
@@ -16,6 +18,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * 默认token管理器
  */
 public class DefaultAccessTokenManager implements AccessTokenManager {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(AccessTokenManager.class);
 
     private static final Map<String, AccessTokenInfo> tokenCache = new ConcurrentHashMap<>();
 
@@ -34,10 +38,16 @@ public class DefaultAccessTokenManager implements AccessTokenManager {
             WeChartMpConfig itemConfig = item.getValue();
             AccessTokenOutputMessage tokenOutputMessage = new AccessTokenOutputMessage(itemConfig.getAppId(), itemConfig.getAppSecurity());
             AccessTokenInputMessage tokenInputMessage = WeChartMpClient.sendMessage(tokenOutputMessage);
-            tokenCache.put(item.getKey(), new AccessTokenInfo(tokenInputMessage.getAccessToken()));
-            long expireTime = (tokenInputMessage.getExpiresIn() - 120) * 1000;//微信Token失效时间 7200秒，提前2分钟刷新对用token，x1000转为毫秒
-            TOKEN_REFRESH_TIMER.schedule(new TokenRefreshTimerTask(this, item.getKey()),
-                    System.currentTimeMillis() + expireTime, expireTime);
+            String errorCode = tokenInputMessage.getErrCode();
+            if (errorCode == null || errorCode.equals("0")) {
+                tokenCache.put(item.getKey(), new AccessTokenInfo(tokenInputMessage.getAccessToken()));
+                long expireTime = (tokenInputMessage.getExpiresIn() - 120) * 1000;//微信Token失效时间 7200秒，提前2分钟刷新对用token，x1000转为毫秒
+                TOKEN_REFRESH_TIMER.schedule(new TokenRefreshTimerTask(this, item.getKey()),
+                        expireTime, expireTime);
+                LOGGER.info("DefaultAccessTokenManager - refresh token schedule start - " + expireTime);
+            } else {
+                LOGGER.error("TOKEN获取异常：" + tokenInputMessage.getErrMsg());
+            }
         });
     }
 
@@ -48,6 +58,7 @@ public class DefaultAccessTokenManager implements AccessTokenManager {
      */
     @Override
     public void refreshToken(String name) {
+        LOGGER.info("StartRefreshToken");
         WeChartMpConfig mpConfig = configManager.getConfig(name);
         if (mpConfig != null) {
             String token = getToken(mpConfig);
@@ -57,6 +68,7 @@ public class DefaultAccessTokenManager implements AccessTokenManager {
                 tokenCache.putIfAbsent(name, tokenInfo);
             }
             tokenInfo.setToken(token);
+            LOGGER.info("Token Refreshed");
         }
     }
 
