@@ -5,6 +5,7 @@ import cn.irving.zhao.platform.weixin.base.message.send.BaseSendOutputMessage;
 import cn.irving.zhao.platform.weixin.base.message.send.MessageSender;
 import cn.irving.zhao.platform.weixin.mp.config.WeChartConfigManager;
 import cn.irving.zhao.platform.weixin.mp.config.impl.DefaultWeChartConfigManager;
+import cn.irving.zhao.platform.weixin.mp.message.send.BaseMpSendInputMessage;
 import cn.irving.zhao.platform.weixin.mp.message.send.BaseMpSendOutputMessage;
 import cn.irving.zhao.platform.weixin.mp.token.AccessTokenManager;
 import cn.irving.zhao.platform.weixin.mp.token.impl.DefaultAccessTokenManager;
@@ -131,7 +132,15 @@ public final class WeChartMpClient {
             String token = me.tokenManager.getToken(configName);
             ((BaseMpSendOutputMessage) outputMessage).setAccessToken(token);
         }
-        return messageSender.sendMessage(outputMessage);
+        T inputMessage = messageSender.sendMessage(outputMessage);
+        if (BaseMpSendInputMessage.class.isInstance(inputMessage)) {
+            BaseMpSendInputMessage sendInputMessage = (BaseMpSendInputMessage) inputMessage;
+            if ("40001".equals(sendInputMessage.getErrCode()) || "40014".equals(sendInputMessage.getErrCode()) || "42001".equals(sendInputMessage.getErrCode())) {
+                me.tokenManager.refreshToken(configName);
+                return sendMessage(configName, outputMessage);
+            }
+        }
+        return inputMessage;
     }
 
     public String getPropertyPath() {
