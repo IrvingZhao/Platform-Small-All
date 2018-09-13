@@ -10,9 +10,12 @@ import cn.irving.zhao.platform.weixin.mp.token.AccessTokenManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Timer;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * 默认token管理器
@@ -25,6 +28,8 @@ public class DefaultAccessTokenManager implements AccessTokenManager {
 
     private static final Timer TOKEN_REFRESH_TIMER = new Timer();
 
+    Map<String, ReentrantLock> lockMap = new HashMap<>();
+
     private WeChartConfigManager configManager;
 
     /**
@@ -35,6 +40,7 @@ public class DefaultAccessTokenManager implements AccessTokenManager {
         this.configManager = configManager;
         Map<String, WeChartMpConfig> configs = configManager.getConfigs();
         configs.entrySet().parallelStream().forEach((item) -> {
+            lockMap.put(item.getKey(), new ReentrantLock());
             WeChartMpConfig itemConfig = item.getValue();
             AccessTokenOutputMessage tokenOutputMessage = new AccessTokenOutputMessage(itemConfig.getAppId(), itemConfig.getAppSecurity());
             AccessTokenInputMessage tokenInputMessage = WeChartMpClient.sendMessage(tokenOutputMessage);
@@ -59,16 +65,30 @@ public class DefaultAccessTokenManager implements AccessTokenManager {
     @Override
     public void refreshToken(String name) {
         LOGGER.info("StartRefreshToken");
-        WeChartMpConfig mpConfig = configManager.getConfig(name);
-        if (mpConfig != null) {
-            String token = getToken(mpConfig);
-            AccessTokenInfo tokenInfo = tokenCache.get(name);
-            if (tokenInfo == null) {
-                tokenInfo = new AccessTokenInfo(token);
+        ReentrantLock lock = lockMap.get(name);
+        AccessTokenInfo tokenInfo = tokenCache.get(name);
+        if (lock.isLocked()) {
+            return;
+        }
+        //多线程锁+读写锁
+        lock.lock();
+        if (tokenInfo == null) {
+            tokenInfo = new AccessTokenInfo("");
+        }
+        tokenInfo.lockWrite();
+        try {
+            WeChartMpConfig mpConfig = configManager.getConfig(name);
+            if (mpConfig != null) {
+                String token = getToken(mpConfig);
                 tokenCache.putIfAbsent(name, tokenInfo);
+                tokenInfo.setToken(token);
+                LOGGER.info("Token Refreshed - NewToken：" + token.substring(0, 5) + "*******");
+            } else {
+                throw new NullPointerException("Cannot find WeChartMpConfig by name [" + name + "]");
             }
-            tokenInfo.setToken(token);
-            LOGGER.info("Token Refreshed");
+        } finally {
+            lock.unlock();
+            tokenInfo.unlockWrite();
         }
     }
 
@@ -79,12 +99,20 @@ public class DefaultAccessTokenManager implements AccessTokenManager {
      */
     @Override
     public String getToken(String name) {
-        return tokenCache.get(name).getToken();
+        AccessTokenInfo tokenInfo = tokenCache.get(name);
+        if (tokenInfo == null) {
+            refreshToken(name);
+            return getToken(name);
+        }
+        return tokenInfo.getToken();
     }
 
     private String getToken(WeChartMpConfig mpConfig) {
         AccessTokenOutputMessage tokenOutputMessage = new AccessTokenOutputMessage(mpConfig.getAppId(), mpConfig.getAppSecurity());
         AccessTokenInputMessage tokenInputMessage = WeChartMpClient.sendMessage(tokenOutputMessage);
+        if (tokenInputMessage.getErrCode() != null && !"".equals(tokenInputMessage.getErrCode())) {
+            LOGGER.error("GET TOKEN FAIL：error code is [" + tokenInputMessage.getErrCode() + "]，reason is [" + tokenInputMessage.getErrMsg() + "]");
+        }
         return tokenInputMessage.getAccessToken();
     }
 }

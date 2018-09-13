@@ -27,12 +27,15 @@ public class AccessTokenInfo {
         }
     }
 
+    public void lockWrite() {
+        lock.writeLock().lock();
+    }
+
+    public void unlockWrite() {
+        lock.writeLock().unlock();
+    }
+
     public void setToken(String token) {
-        try {
-            lock.writeLock().lock();
-            this.token = token;
-        } finally {
-            lock.writeLock().unlock();
-        }
+        this.token = token;
     }
 }

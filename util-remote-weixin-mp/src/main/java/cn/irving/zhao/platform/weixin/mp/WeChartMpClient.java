@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Properties;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * 微信公众号客户端
@@ -42,6 +43,8 @@ public final class WeChartMpClient {
     private AccessTokenManager tokenManager;
     private WeChartConfigManager configManager;
 
+    private boolean init = false;
+
     //微信公众号配置文件
     //AccessTokenManager类
     //WeChartMpConfigManager类
@@ -53,11 +56,14 @@ public final class WeChartMpClient {
      * <p>当账户管理器或token管理器为null时，采用配置文件形式进行账户管理器与token管理器实例化</p>
      */
     public synchronized void init() {
-        if (this.configManager == null || this.tokenManager == null) {
-            loadProperties();
+        if (!init) {
+            if (this.configManager == null || this.tokenManager == null) {
+                loadProperties();
+            }
+            this.configManager.init();
+            this.tokenManager.init(this.configManager);
         }
-        this.configManager.init();
-        this.tokenManager.init(this.configManager);
+        init = true;
     }
 
     /**
@@ -67,7 +73,7 @@ public final class WeChartMpClient {
     public void loadProperties() {
         try {
             Properties properties = new Properties();
-            properties.load(WeChartMpClient.class.getResourceAsStream(propertyPath));//TODO 读取相关配置文件，配置方式变更
+            properties.load(WeChartMpClient.class.getResourceAsStream(propertyPath));
             try {
                 //初始化configManager
                 configManager:
@@ -128,14 +134,20 @@ public final class WeChartMpClient {
     }
 
     public static <T extends BaseSendInputMessage> T sendMessage(String configName, BaseSendOutputMessage<T> outputMessage) {
+        if (me.tokenManager == null || me.configManager == null) {
+            me.init();
+        }
         if (BaseMpSendOutputMessage.class.isInstance(outputMessage)) {
             String token = me.tokenManager.getToken(configName);
             ((BaseMpSendOutputMessage) outputMessage).setAccessToken(token);
         }
         T inputMessage = messageSender.sendMessage(outputMessage);
-        if (BaseMpSendInputMessage.class.isInstance(inputMessage)) {
+
+        if (BaseMpSendInputMessage.class.isInstance(inputMessage)) {//添加刷新机制
             BaseMpSendInputMessage sendInputMessage = (BaseMpSendInputMessage) inputMessage;
             if ("40001".equals(sendInputMessage.getErrCode()) || "40014".equals(sendInputMessage.getErrCode()) || "42001".equals(sendInputMessage.getErrCode())) {
+                me.logger.info("token need refresh by code [" + sendInputMessage.getErrCode() + "], reason [" + sendInputMessage.getErrMsg() + "]");
+
                 me.tokenManager.refreshToken(configName);
                 return sendMessage(configName, outputMessage);
             }
