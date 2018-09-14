@@ -23,4 +23,7 @@ public @interface WeChartMessage {
     WeChartMessageFormat requestType() default WeChartMessageFormat.FORM;
 
     WeChartMessageFormat responseType() default WeChartMessageFormat.JSON;
+
+    RequestHead[] requestHead() default {};
+
 }
