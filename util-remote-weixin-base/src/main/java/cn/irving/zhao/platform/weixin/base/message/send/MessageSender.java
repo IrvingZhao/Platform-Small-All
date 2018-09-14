@@ -54,6 +54,8 @@ public class MessageSender {
 
         private String requestString;
 
+        private Map<String, String> requestHeader;
+
 
         BaseHttpMessage(BaseSendOutputMessage outputMessage) {
             WeChartMessageConfig messageConfig = outputMessage.getMessageConfig();
@@ -83,6 +85,7 @@ public class MessageSender {
                     this.requestType = RequestType.MULTIPART;
                     this.requestParams = outputMessage.getParamMap();
             }
+            this.requestHeader = messageConfig.getRequestHead();
         }
 
         @Override
@@ -122,6 +125,11 @@ public class MessageSender {
         @Override
         public void setResponseStream(InputStream inputStream) {
             this.responseStream = inputStream;
+        }
+
+        @Override
+        public Map<String, String> getRequestHead() {
+            return requestHeader;
         }
     }
 
