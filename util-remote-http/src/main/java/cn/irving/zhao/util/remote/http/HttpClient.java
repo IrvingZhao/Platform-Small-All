@@ -105,7 +105,9 @@ public class HttpClient {
                 }
             }
             request = generateRequest(requestUrl, message.getRequestMethod());
-            message.getRequestHead().forEach(request::addHeader);
+            if(message.getRequestHead()!=null) {
+                message.getRequestHead().forEach(request::addHeader);
+            }
             if (entity != null) {
                 request.setEntity(entity);
             }
