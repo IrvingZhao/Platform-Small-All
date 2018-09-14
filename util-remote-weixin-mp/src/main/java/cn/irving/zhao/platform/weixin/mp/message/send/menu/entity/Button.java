@@ -21,7 +21,7 @@ public final class Button {
         Button result = new Button();
         result.name = name;
         result.key = key;
-        result.type = MenuType.click;
+        result.type = MenuType.CLICK;
         return result;
     }
 
@@ -36,7 +36,7 @@ public final class Button {
         Button result = new Button();
         result.name = name;
         result.url = url;
-        result.type = MenuType.view;
+        result.type = MenuType.VIEW;
         return result;
     }
 
@@ -51,7 +51,7 @@ public final class Button {
         Button result = new Button();
         result.name = name;
         result.key = key;
-        result.type = MenuType.scancode_push;
+        result.type = MenuType.SCAN_CODE_PUSH;
         return result;
     }
 
@@ -66,7 +66,7 @@ public final class Button {
         Button result = new Button();
         result.name = name;
         result.key = key;
-        result.type = MenuType.scancode_waitmsg;
+        result.type = MenuType.SCAN_CODE_WAIT_MSG;
         return result;
     }
 
@@ -81,7 +81,7 @@ public final class Button {
         Button result = new Button();
         result.name = name;
         result.key = key;
-        result.type = MenuType.pic_sysphoto;
+        result.type = MenuType.PIC_SYS_PHOTO;
         return result;
     }
 
@@ -96,7 +96,7 @@ public final class Button {
         Button result = new Button();
         result.name = name;
         result.key = key;
-        result.type = MenuType.pic_photo_or_album;
+        result.type = MenuType.PIC_PHOTO_OR_ALBUM;
         return result;
     }
 
@@ -111,7 +111,7 @@ public final class Button {
         Button result = new Button();
         result.name = name;
         result.key = key;
-        result.type = MenuType.pic_weixin;
+        result.type = MenuType.PIC_WEIXIN;
         return result;
     }
 
@@ -126,7 +126,7 @@ public final class Button {
         Button result = new Button();
         result.name = name;
         result.key = key;
-        result.type = MenuType.location_select;
+        result.type = MenuType.LOCATION_SELECT;
         return result;
     }
 
@@ -141,7 +141,7 @@ public final class Button {
         Button result = new Button();
         result.name = name;
         result.mediaId = mediaId;
-        result.type = MenuType.media_id;
+        result.type = MenuType.MEDIA_ID;
         return result;
     }
 
@@ -156,7 +156,7 @@ public final class Button {
         Button result = new Button();
         result.name = name;
         result.mediaId = mediaId;
-        result.type = MenuType.view_limited;
+        result.type = MenuType.VIEW_LIMITED;
         return result;
     }
 
@@ -174,7 +174,7 @@ public final class Button {
         result.url = url;
         result.appId = appId;
         result.pagePath = pagePath;
-        result.type = MenuType.miniprogram;
+        result.type = MenuType.MINI_PROGRAM;
         return result;
     }
 
