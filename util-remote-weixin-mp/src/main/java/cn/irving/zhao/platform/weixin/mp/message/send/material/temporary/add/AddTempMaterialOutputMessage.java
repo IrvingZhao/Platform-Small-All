@@ -1,4 +1,4 @@
-package cn.irving.zhao.platform.weixin.mp.message.send.material.temporary;
+package cn.irving.zhao.platform.weixin.mp.message.send.material.temporary.add;
 
 import cn.irving.zhao.platform.weixin.base.config.enums.WeChartMessageFormat;
 import cn.irving.zhao.platform.weixin.base.config.enums.WeChartMessageRequestMethod;
@@ -9,8 +9,6 @@ import cn.irving.zhao.platform.weixin.mp.message.send.material.entity.MediaType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author zhaojn1

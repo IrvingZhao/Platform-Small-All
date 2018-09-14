@@ -1,4 +1,4 @@
-package cn.irving.zhao.platform.weixin.mp.message.send.material.temporary;
+package cn.irving.zhao.platform.weixin.mp.message.send.material.temporary.add;
 
 import cn.irving.zhao.platform.weixin.mp.message.send.BaseMpSendInputMessage;
 import cn.irving.zhao.platform.weixin.mp.message.send.material.entity.MediaType;
