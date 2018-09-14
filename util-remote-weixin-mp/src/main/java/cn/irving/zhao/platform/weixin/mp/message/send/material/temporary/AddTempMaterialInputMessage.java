@@ -1,6 +1,7 @@
 package cn.irving.zhao.platform.weixin.mp.message.send.material.temporary;
 
 import cn.irving.zhao.platform.weixin.mp.message.send.BaseMpSendInputMessage;
+import cn.irving.zhao.platform.weixin.mp.message.send.material.entity.MediaType;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -16,21 +17,30 @@ public class AddTempMaterialInputMessage extends BaseMpSendInputMessage {
     @JsonProperty("create_at")
     private String createAt;
 
+    @JsonProperty("type")
+    private MediaType mediaType;
+
     public String getMediaId() {
         return mediaId;
     }
 
-    public AddTempMaterialInputMessage setMediaId(String mediaId) {
+    public void setMediaId(String mediaId) {
         this.mediaId = mediaId;
-        return this;
     }
 
     public String getCreateAt() {
         return createAt;
     }
 
-    public AddTempMaterialInputMessage setCreateAt(String createAt) {
+    public void setCreateAt(String createAt) {
         this.createAt = createAt;
-        return this;
+    }
+
+    public MediaType getMediaType() {
+        return mediaType;
+    }
+
+    public void setMediaType(MediaType mediaType) {
+        this.mediaType = mediaType;
     }
 }
