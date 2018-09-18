@@ -39,7 +39,7 @@ public class MessageSender {
                 serialType = ObjectStringSerialUtil.SerialType.XML;
                 break;
         }
-        Class<T> inputClass = outputMessage.getInputMessageClass();
+        Class<? extends T> inputClass = outputMessage.getInputMessageClass();
         return serialUtil.parse(httpMessage.responseStream, inputClass, serialType);
 //      TODO 请求结果非200情况下的异常信息
     }

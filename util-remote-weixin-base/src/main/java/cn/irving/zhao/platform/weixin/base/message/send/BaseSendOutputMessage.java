@@ -26,7 +26,7 @@ public abstract class BaseSendOutputMessage<T extends BaseSendInputMessage> exte
     public abstract String getUrl();
 
     @JsonIgnore
-    public Class<T> getInputMessageClass() {
+    public Class<? extends T> getInputMessageClass() {
         return getSuperParameterizedType(this.getClass());
     }
 
