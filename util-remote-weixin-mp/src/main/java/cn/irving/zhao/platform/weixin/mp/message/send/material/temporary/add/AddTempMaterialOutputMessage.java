@@ -7,6 +7,8 @@ import cn.irving.zhao.platform.weixin.base.config.message.WeChartMessage;
 import cn.irving.zhao.platform.weixin.mp.message.send.BaseMpSendOutputMessage;
 import cn.irving.zhao.platform.weixin.mp.message.send.material.entity.MediaType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.File;
 
@@ -15,6 +17,8 @@ import java.io.File;
  * @version AddTempMaterialOutputMessage.java, v 0.1 2018/3/19 zhaojn1
  * @project userProfile
  */
+@Getter
+@Setter
 @WeChartMessage(requestType = WeChartMessageFormat.MULTIPART, requestMethod = WeChartMessageRequestMethod.POST,
         requestHead = {@RequestHead(key = "Content-Type", value = "multipart/form-data")})
 public class AddTempMaterialOutputMessage extends BaseMpSendOutputMessage<AddTempMaterialInputMessage> {
@@ -29,29 +33,6 @@ public class AddTempMaterialOutputMessage extends BaseMpSendOutputMessage<AddTem
     @Override
     public String getUrl() {
         return String.format(REQUEST_URL, accessToken, type.getCode());
-    }
-
-    @Override
-    public Class<AddTempMaterialInputMessage> getInputMessageClass() {
-        return AddTempMaterialInputMessage.class;
-    }
-
-    public MediaType getType() {
-        return type;
-    }
-
-    public AddTempMaterialOutputMessage setType(MediaType type) {
-        this.type = type;
-        return this;
-    }
-
-    public File getMedia() {
-        return media;
-    }
-
-    public AddTempMaterialOutputMessage setMedia(File media) {
-        this.media = media;
-        return this;
     }
 
 }
