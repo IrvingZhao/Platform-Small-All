@@ -5,6 +5,8 @@ import cn.irving.zhao.platform.weixin.base.config.enums.WeChartMessageRequestMet
 import cn.irving.zhao.platform.weixin.base.config.message.WeChartMessage;
 import cn.irving.zhao.platform.weixin.mp.message.send.BaseMpSendOutputMessage;
 import cn.irving.zhao.platform.weixin.mp.message.send.menu.entity.Button;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +14,8 @@ import java.util.List;
 /**
  * 创建菜单输出消息
  */
+@Getter
+@Setter
 @WeChartMessage(requestMethod = WeChartMessageRequestMethod.POST, requestType = WeChartMessageFormat.JSON)
 public class CreateMenuOutputMessage extends BaseMpSendOutputMessage<CreateMenuInputMessage> {
 
@@ -30,21 +34,9 @@ public class CreateMenuOutputMessage extends BaseMpSendOutputMessage<CreateMenuI
     }
 
     @Override
-    public Class<CreateMenuInputMessage> getInputMessageClass() {
-        return CreateMenuInputMessage.class;
-    }
-
-    @Override
     public String getUrl() {
         String url = "https://api.weixin.qq.com/cgi-bin/menu/create?access_token=%s";
         return String.format(url, accessToken);
     }
 
-    public List<Button> getButton() {
-        return button;
-    }
-
-    public void setButton(List<Button> button) {
-        this.button = button;
-    }
 }

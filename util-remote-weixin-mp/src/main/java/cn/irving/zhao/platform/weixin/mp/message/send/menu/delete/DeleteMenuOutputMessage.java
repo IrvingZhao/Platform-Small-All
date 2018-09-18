@@ -8,11 +8,6 @@ import cn.irving.zhao.platform.weixin.mp.message.send.BaseMpSendOutputMessage;
 public class DeleteMenuOutputMessage extends BaseMpSendOutputMessage<DeleteMenuInputMessage> {
 
     @Override
-    public Class<DeleteMenuInputMessage> getInputMessageClass() {
-        return DeleteMenuInputMessage.class;
-    }
-
-    @Override
     public String getUrl() {
         return String.format("https://api.weixin.qq.com/cgi-bin/menu/delete?access_token=%s", accessToken);
     }

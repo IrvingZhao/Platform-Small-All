@@ -2,7 +2,14 @@ package cn.irving.zhao.platform.weixin.mp.message.send.web;
 
 import cn.irving.zhao.platform.weixin.base.message.send.BaseSendInputMessage;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
+import lombok.Setter;
 
+/**
+ * 用户AccessToken 响应类
+ */
+@Setter
+@Getter
 public class UserAccessTokenInputMessage extends BaseSendInputMessage {
 
     @JsonProperty("access_token")
@@ -16,43 +23,4 @@ public class UserAccessTokenInputMessage extends BaseSendInputMessage {
     @JsonProperty("scope")
     private String scope;
 
-    public String getAccessToken() {
-        return accessToken;
-    }
-
-    public void setAccessToken(String accessToken) {
-        this.accessToken = accessToken;
-    }
-
-    public int getExpiresIn() {
-        return expiresIn;
-    }
-
-    public void setExpiresIn(int expiresIn) {
-        this.expiresIn = expiresIn;
-    }
-
-    public String getRefreshToken() {
-        return refreshToken;
-    }
-
-    public void setRefreshToken(String refreshToken) {
-        this.refreshToken = refreshToken;
-    }
-
-    public String getOpenId() {
-        return openId;
-    }
-
-    public void setOpenId(String openId) {
-        this.openId = openId;
-    }
-
-    public String getScope() {
-        return scope;
-    }
-
-    public void setScope(String scope) {
-        this.scope = scope;
-    }
 }

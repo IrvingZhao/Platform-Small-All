@@ -3,6 +3,8 @@ package cn.irving.zhao.platform.weixin.mp.message.send.token;
 import cn.irving.zhao.platform.weixin.base.config.message.WeChartMessage;
 import cn.irving.zhao.platform.weixin.base.message.send.BaseSendOutputMessage;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * 微信 AccessToken 获取消息 - 请求消息
@@ -10,6 +12,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * @author Irving Zhao
  */
 @WeChartMessage
+@Setter
+@Getter
 public class AccessTokenOutputMessage extends BaseSendOutputMessage<AccessTokenInputMessage> {
 
     private static final String REQUEST_URL = "https://api.weixin.qq.com/cgi-bin/token";
@@ -30,35 +34,4 @@ public class AccessTokenOutputMessage extends BaseSendOutputMessage<AccessTokenI
         return REQUEST_URL;
     }
 
-    @Override
-    public Class<AccessTokenInputMessage> getInputMessageClass() {
-        return AccessTokenInputMessage.class;
-    }
-
-    public String getAppId() {
-        return appId;
-    }
-
-    public AccessTokenOutputMessage setAppId(String appId) {
-        this.appId = appId;
-        return this;
-    }
-
-    public String getGrantType() {
-        return grantType;
-    }
-
-    public AccessTokenOutputMessage setGrantType(String grantType) {
-        this.grantType = grantType;
-        return this;
-    }
-
-    public String getSecret() {
-        return secret;
-    }
-
-    public AccessTokenOutputMessage setSecret(String secret) {
-        this.secret = secret;
-        return this;
-    }
 }

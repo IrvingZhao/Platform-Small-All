@@ -1,6 +1,8 @@
 package cn.irving.zhao.platform.weixin.mp.message.send.menu.entity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,6 +10,8 @@ import java.util.List;
 /**
  * 按钮配置信息
  */
+@Getter
+@Setter
 public final class Button {
 
     /**
@@ -212,67 +216,4 @@ public final class Button {
     @JsonProperty("sub_button")
     private List<Button> subButton;//子菜单
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public MenuType getType() {
-        return type;
-    }
-
-    public void setType(MenuType type) {
-        this.type = type;
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
-    public String getMediaId() {
-        return mediaId;
-    }
-
-    public void setMediaId(String mediaId) {
-        this.mediaId = mediaId;
-    }
-
-    public String getAppId() {
-        return appId;
-    }
-
-    public void setAppId(String appId) {
-        this.appId = appId;
-    }
-
-    public String getPagePath() {
-        return pagePath;
-    }
-
-    public void setPagePath(String pagePath) {
-        this.pagePath = pagePath;
-    }
-
-    public List<Button> getSubButton() {
-        return subButton;
-    }
-
-    public void setSubButton(List<Button> subButton) {
-        this.subButton = subButton;
-    }
 }

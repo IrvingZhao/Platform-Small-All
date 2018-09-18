@@ -1,10 +1,14 @@
 package cn.irving.zhao.platform.weixin.mp.message.send.menu.entity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * 个性化菜单匹配规则类
  */
+@Getter
+@Setter
 public class MatchRule {
 
     @JsonProperty("tag_id")
@@ -23,59 +27,4 @@ public class MatchRule {
 
     private String language;
 
-    public String getTagId() {
-        return tagId;
-    }
-
-    public void setTagId(String tagId) {
-        this.tagId = tagId;
-    }
-
-    public Sex getSex() {
-        return sex;
-    }
-
-    public void setSex(Sex sex) {
-        this.sex = sex;
-    }
-
-    public PlatformType getPlatform() {
-        return platform;
-    }
-
-    public void setPlatform(PlatformType platform) {
-        this.platform = platform;
-    }
-
-    public String getCountry() {
-        return country;
-    }
-
-    public void setCountry(String country) {
-        this.country = country;
-    }
-
-    public String getProvince() {
-        return province;
-    }
-
-    public void setProvince(String province) {
-        this.province = province;
-    }
-
-    public String getCity() {
-        return city;
-    }
-
-    public void setCity(String city) {
-        this.city = city;
-    }
-
-    public String getLanguage() {
-        return language;
-    }
-
-    public void setLanguage(String language) {
-        this.language = language;
-    }
 }

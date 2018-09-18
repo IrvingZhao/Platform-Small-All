@@ -5,12 +5,19 @@ import cn.irving.zhao.platform.weixin.base.config.enums.WeChartMessageRequestMet
 import cn.irving.zhao.platform.weixin.base.config.message.WeChartMessage;
 import cn.irving.zhao.platform.weixin.mp.message.send.BaseMpSendOutputMessage;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * 模板消息发送类
+ * */
 @WeChartMessage(requestMethod = WeChartMessageRequestMethod.POST,
         requestType = WeChartMessageFormat.JSON)
+@Setter
+@Getter
 public class SendTemplateOutputMessage extends BaseMpSendOutputMessage<SendTemplateInputMessage> {
 
     private static final String requestUrl = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=%s";
@@ -42,57 +49,16 @@ public class SendTemplateOutputMessage extends BaseMpSendOutputMessage<SendTempl
         return this;
     }
 
+    /**
+     * 配置重定向小程序
+     */
+    public void setMiniProgramConfig(String appId, String path) {
+        this.miniProgramConfig = new MiniProgramConfig(appId, path);
+    }
+
     @Override
     public String getUrl() {
         return String.format(requestUrl, accessToken);
     }
 
-    @Override
-    public Class<SendTemplateInputMessage> getInputMessageClass() {
-        return SendTemplateInputMessage.class;
-    }
-
-    public static String getRequestUrl() {
-        return requestUrl;
-    }
-
-    public String getToUser() {
-        return toUser;
-    }
-
-    public void setToUser(String toUser) {
-        this.toUser = toUser;
-    }
-
-    public String getTemplateId() {
-        return templateId;
-    }
-
-    public void setTemplateId(String templateId) {
-        this.templateId = templateId;
-    }
-
-    public MiniProgramConfig getMiniProgramConfig() {
-        return miniProgramConfig;
-    }
-
-    public void setMiniProgramConfig(MiniProgramConfig miniProgramConfig) {
-        this.miniProgramConfig = miniProgramConfig;
-    }
-
-    public Map<String, Map<String, String>> getData() {
-        return data;
-    }
-
-    public void setData(Map<String, Map<String, String>> data) {
-        this.data = data;
-    }
-
-    public String getRedirectUrl() {
-        return redirectUrl;
-    }
-
-    public void setRedirectUrl(String redirectUrl) {
-        this.redirectUrl = redirectUrl;
-    }
 }

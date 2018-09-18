@@ -2,7 +2,14 @@ package cn.irving.zhao.platform.weixin.mp.message.send.web;
 
 import cn.irving.zhao.platform.weixin.base.message.send.BaseSendOutputMessage;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
+import lombok.Setter;
 
+/**
+ * 用户AccessToken 请求类
+ * */
+@Setter
+@Getter
 public class UserAccessTokenOutputMessage extends BaseSendOutputMessage<UserAccessTokenInputMessage> {
 
     public UserAccessTokenOutputMessage(String appId, String appSecurity, String code) {
@@ -26,40 +33,4 @@ public class UserAccessTokenOutputMessage extends BaseSendOutputMessage<UserAcce
         return REQUEST_URL;
     }
 
-    @Override
-    public Class<UserAccessTokenInputMessage> getInputMessageClass() {
-        return UserAccessTokenInputMessage.class;
-    }
-
-    public String getAppId() {
-        return appId;
-    }
-
-    public void setAppId(String appId) {
-        this.appId = appId;
-    }
-
-    public String getAppSecurity() {
-        return appSecurity;
-    }
-
-    public void setAppSecurity(String appSecurity) {
-        this.appSecurity = appSecurity;
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
-    }
-
-    public String getGrantType() {
-        return grantType;
-    }
-
-    public void setGrantType(String grantType) {
-        this.grantType = grantType;
-    }
 }

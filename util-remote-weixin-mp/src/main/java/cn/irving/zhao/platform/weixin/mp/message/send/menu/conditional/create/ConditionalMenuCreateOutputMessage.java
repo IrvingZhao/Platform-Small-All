@@ -4,6 +4,8 @@ import cn.irving.zhao.platform.weixin.mp.message.send.BaseMpSendOutputMessage;
 import cn.irving.zhao.platform.weixin.mp.message.send.menu.entity.Button;
 import cn.irving.zhao.platform.weixin.mp.message.send.menu.entity.MatchRule;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +13,8 @@ import java.util.List;
 /**
  * 个性化菜单创建请求消息
  */
+@Getter
+@Setter
 public class ConditionalMenuCreateOutputMessage extends BaseMpSendOutputMessage<ConditionalMenuCreateInputMessage> {
 
     @JsonProperty("button")
@@ -32,29 +36,9 @@ public class ConditionalMenuCreateOutputMessage extends BaseMpSendOutputMessage<
     }
 
     @Override
-    public Class<ConditionalMenuCreateInputMessage> getInputMessageClass() {
-        return ConditionalMenuCreateInputMessage.class;
-    }
-
-    @Override
     public String getUrl() {
         String url = "https://api.weixin.qq.com/cgi-bin/menu/addconditional?access_token=%s";
         return String.format(url, accessToken);
     }
 
-    public List<Button> getButtons() {
-        return buttons;
-    }
-
-    public void setButtons(List<Button> buttons) {
-        this.buttons = buttons;
-    }
-
-    public MatchRule getMatchRule() {
-        return matchRule;
-    }
-
-    public void setMatchRule(MatchRule matchRule) {
-        this.matchRule = matchRule;
-    }
 }
