@@ -9,9 +9,7 @@ import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Modifier;
+import java.lang.reflect.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -28,7 +26,23 @@ public abstract class BaseSendOutputMessage<T extends BaseSendInputMessage> exte
     public abstract String getUrl();
 
     @JsonIgnore
-    public abstract Class<T> getInputMessageClass();
+    public Class<T> getInputMessageClass() {
+        return getSuperParameterizedType(this.getClass());
+    }
+
+    @JsonIgnore
+    private Class<T> getSuperParameterizedType(Class<?> temp) {
+        Type type = temp.getGenericSuperclass();
+        if (ParameterizedType.class.isInstance(type)) {
+            ParameterizedType typeClazz = (ParameterizedType) type;
+            return (Class<T>) typeClazz.getActualTypeArguments()[0];
+        } else {
+            if (BaseSendOutputMessage.class.isAssignableFrom(temp.getSuperclass())) {
+                return getSuperParameterizedType(temp.getSuperclass());
+            }
+            throw new IllegalArgumentException("Cannot find ParameterizedType of [" + this.getClass() + "]");
+        }
+    }
 
     @JsonIgnore
     private Map<String, Field> fieldCache;
