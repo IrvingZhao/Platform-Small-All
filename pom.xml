@@ -6,7 +6,7 @@
 
     <groupId>cn.irving.zhao.platform</groupId>
     <artifactId>platform-parent</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.0</version>
     <modules>
         <module>core-dao</module>
         <module>core-spring</module>
@@ -23,7 +23,7 @@
     <packaging>pom</packaging>
 
     <properties>
-        <platform.version>1.0-SNAPSHOT</platform.version>
+        <platform.version>1.0.0</platform.version>
         <java.compile.plugin.version>3.7.0</java.compile.plugin.version>
         <resource.compile.plugin.version>3.0.2</resource.compile.plugin.version>
         <war.package.plugin.version>3.2.0</war.package.plugin.version>
