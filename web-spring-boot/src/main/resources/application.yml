@@ -1,5 +1,0 @@
-project:
-  transaction:
-    pointcutExpress: 'execution(* cn.irving.zhao..service.*.*(..))'
-    transaction-attributes:
-      - roll-back-for: [java.lang.NullPointerException]
