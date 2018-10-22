@@ -10,7 +10,7 @@ import javax.annotation.Resource;
 import java.io.Serializable;
 import java.util.List;
 
-public abstract class BaseDao<T, PK extends Serializable, M extends CustomMapper<T>> implements IBaseDao<T, PK> {
+public abstract class BaseDaoImpl<T, PK extends Serializable, M extends CustomMapper<T>> implements IBaseDao<T, PK> {
 
     @Resource
     protected M mapper;
