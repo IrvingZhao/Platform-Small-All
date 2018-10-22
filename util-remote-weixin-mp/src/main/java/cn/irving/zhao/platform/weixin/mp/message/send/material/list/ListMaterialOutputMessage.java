@@ -1,8 +1,16 @@
 package cn.irving.zhao.platform.weixin.mp.message.send.material.list;
 
+import cn.irving.zhao.platform.weixin.base.config.enums.WeChartMessageFormat;
+import cn.irving.zhao.platform.weixin.base.config.enums.WeChartMessageRequestMethod;
+import cn.irving.zhao.platform.weixin.base.config.message.WeChartMessage;
 import cn.irving.zhao.platform.weixin.mp.message.send.BaseMpSendOutputMessage;
 import cn.irving.zhao.platform.weixin.mp.message.send.material.entity.MediaType;
+import lombok.Getter;
+import lombok.Setter;
 
+@Setter
+@Getter
+@WeChartMessage(requestType = WeChartMessageFormat.JSON, requestMethod = WeChartMessageRequestMethod.POST)
 public class ListMaterialOutputMessage extends BaseMpSendOutputMessage<ListMaterialInputMessage> {
     private static final String url = "https://api.weixin.qq.com/cgi-bin/material/batchget_material?access_token=%s";
 
@@ -15,27 +23,23 @@ public class ListMaterialOutputMessage extends BaseMpSendOutputMessage<ListMater
     private int offset;
     private int count;
 
-    public MediaType getType() {
-        return type;
-    }
-
-    public void setType(MediaType type) {
-        this.type = type;
-    }
-
-    public int getOffset() {
-        return offset;
-    }
-
-    public void setOffset(int offset) {
-        this.offset = offset;
-    }
-
-    public int getCount() {
-        return count;
-    }
-
-    public void setCount(int count) {
-        this.count = count;
+    @Override
+    public Class<? extends ListMaterialInputMessage> getInputMessageClass() {
+        Class<? extends ListMaterialInputMessage> result;
+        switch (type) {
+            case NEWS:
+                result =  ListMaterialNewsInputMessage.class;
+                break;
+            case IMAGE:
+            case THUMB:
+            case VIDEO:
+            case VOICE:
+                result = ListMaterialOtherInputMessage.class;
+                break;
+            default:
+                result = null;
+                break;
+        }
+        return result;
     }
 }
