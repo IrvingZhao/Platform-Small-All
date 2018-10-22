@@ -11,4 +11,8 @@ public interface IWorkbook {
         return WorkbookType.XLSX;
     }
 
+    default String getSheetName() {
+        return String.valueOf(System.currentTimeMillis());
+    }
+
 }
