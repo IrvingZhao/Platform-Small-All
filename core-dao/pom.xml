@@ -12,6 +12,13 @@
     <artifactId>core-dao</artifactId>
 
     <dependencies>
+
+        <dependency>
+            <groupId>cn.irving.zhao.platform</groupId>
+            <artifactId>util-base</artifactId>
+            <version>${platform.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>org.mybatis</groupId>
             <artifactId>mybatis</artifactId>
