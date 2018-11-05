@@ -10,6 +10,9 @@ import javax.annotation.Resource;
 import java.io.Serializable;
 import java.util.List;
 
+/**
+ * 基础实现dao
+ */
 public abstract class BaseDaoImpl<T, PK extends Serializable, M extends CustomMapper<T>> implements IBaseDao<T, PK> {
 
     @Resource

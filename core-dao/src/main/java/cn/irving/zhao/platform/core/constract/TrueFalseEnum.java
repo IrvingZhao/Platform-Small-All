@@ -2,6 +2,9 @@ package cn.irving.zhao.platform.core.constract;
 
 import cn.irving.zhao.util.base.serial.custom.CustomEnumValue;
 
+/**
+ * 是否枚举类
+ */
 public enum TrueFalseEnum implements CustomEnumValue<TrueFalseEnum, Boolean> {
     Y(Boolean.TRUE), N(Boolean.FALSE);
 

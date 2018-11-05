@@ -6,6 +6,9 @@ import com.github.pagehelper.PageInfo;
 import tk.mybatis.mapper.common.IdsMapper;
 import tk.mybatis.mapper.common.Mapper;
 
+/**
+ * 基于 tkMapper 进行扩展，添加分页方法
+ */
 public interface CustomMapper<T> extends Mapper<T>, IdsMapper<T> {
 
     default PageInfo<T> selectPage(int pageIndex, int pageSize) {

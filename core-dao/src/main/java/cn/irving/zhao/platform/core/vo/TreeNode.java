@@ -9,6 +9,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 树节点工具类，提供基础的id，parentId，children内容，可额外添加其他属性
+ */
 @Getter
 @Setter
 @AllArgsConstructor
@@ -20,11 +23,11 @@ public abstract class TreeNode<T, U extends TreeNode<T, U>> {
 
     public void setData(List<T> data) {
         Map<String, U> cache = new HashMap<>();
-        TreeNode root = this;
+        TreeNode<T, U> root = this;
         data.stream().map(this::parse).forEach((item) -> cache.put(item.getId(), item));
 
         cache.forEach((key, value) -> {
-            TreeNode parent;
+            TreeNode<T, U> parent;
             if (value.getParentId() == null || "".equals(value.getParentId().trim())) {
                 parent = root;
             } else {

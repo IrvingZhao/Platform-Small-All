@@ -6,6 +6,9 @@ import lombok.Setter;
 import javax.persistence.Column;
 import java.util.Date;
 
+/**
+ * 更新状态实体类，包含是否删除标志位
+ */
 @Getter
 @Setter
 public class StateEntity extends DFlagEntity {

@@ -6,6 +6,9 @@ import lombok.Setter;
 
 import javax.persistence.Column;
 
+/**
+ * 删除标志位实体类
+ */
 @Getter
 @Setter
 public class DFlagEntity {

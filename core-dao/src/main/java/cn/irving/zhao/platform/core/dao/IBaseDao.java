@@ -1,12 +1,14 @@
 package cn.irving.zhao.platform.core.dao;
 
-import com.github.pagehelper.Page;
 import com.github.pagehelper.PageInfo;
 import org.apache.ibatis.annotations.Param;
 
 import java.io.Serializable;
 import java.util.List;
 
+/**
+ * dao接口
+ */
 public interface IBaseDao<T, PK extends Serializable> {
     /**
      * 保存一个实体，null的属性也会保存，不会使用数据库默认值
