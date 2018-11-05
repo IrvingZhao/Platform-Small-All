@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * 日志拦截器
+ * <p>日志拦截器</p>
  * <p>记录单请求时间</p>
  * <p>声明 RequestTimeLogger 进行请求时间记录</p>
  */
@@ -26,12 +26,6 @@ public class LogInterceptor implements HandlerInterceptor {
                              Object handler) throws Exception {
         //设置线程开启时间
         startTimeThreadLocal.set(System.currentTimeMillis());
-//        if (logger.isDebugEnabled()) {
-//            long beginTime = System.currentTimeMillis();//1、开始时间
-//            startTimeThreadLocal.set(beginTime);        //线程绑定变量（该数据只有当前请求的线程可见）
-//            logger.debug("开始计时: {}  URI: {}", new SimpleDateFormat("hh:mm:ss.SSS")
-//                    .format(beginTime), request.getRequestURI());
-//        }
         return true;
     }
 
@@ -50,14 +44,6 @@ public class LogInterceptor implements HandlerInterceptor {
         long endTime = System.currentTimeMillis();    //2、结束时间
         //日志输出记录访问时间
         logger.info("请求耗时：{\"url\":\"{}\", \"duringTime\":{}, \"endTime\":{}, \"handleClass\":\"{}\", \"exception\":\"{}\" }", request.getRequestURI(), endTime - beginTime, endTime, handler.getClass().getName(), ex == null ? "" : ex.getMessage());
-
-//        if (logger.isDebugEnabled()) {
-//            logger.debug("计时结束：{}  耗时：{}  URI: {}  最大内存: {}m  已分配内存: {}m  已分配内存中的剩余空间: {}m  最大可用内存: {}m",
-//                    new SimpleDateFormat("hh:mm:ss.SSS").format(endTime), DateUtil.dateTimeToString(new Date(endTime - beginTime)),
-//                    request.getRequestURI(), Runtime.getRuntime().maxMemory() / 1024 / 1024, Runtime.getRuntime().totalMemory() / 1024 / 1024, Runtime.getRuntime().freeMemory() / 1024 / 1024,
-//                    (Runtime.getRuntime().maxMemory() - Runtime.getRuntime().totalMemory() + Runtime.getRuntime().freeMemory()) / 1024 / 1024);
-//        }
-
     }
 
 }

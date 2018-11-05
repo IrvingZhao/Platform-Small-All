@@ -20,8 +20,8 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- * 让静态变量保存到Spring ApplicationContext
- * 可在任何代码任何地方任何时候中取出ApplicaitonContext
+ * <p>让静态变量保存到Spring ApplicationContext</p>
+ * <p>可在任何代码任何地方任何时候中取出ApplicaitonContext</p>
  */
 public class SpringContextUtil implements ApplicationContextAware, DisposableBean {
 

@@ -18,7 +18,7 @@ import java.util.Objects;
 @Setter
 public class BindingErrorControllerAspect implements MethodBeforeAdvice {
 
-    private String errorCode;
+    private String errorCode = "100000";
 
     @Override
     public void before(Method method, Object[] objects, Object o) throws Throwable {

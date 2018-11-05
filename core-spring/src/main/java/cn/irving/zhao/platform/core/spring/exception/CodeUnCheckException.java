@@ -3,6 +3,9 @@ package cn.irving.zhao.platform.core.spring.exception;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * 带有错误编码的非检查异常
+ */
 @Getter
 @Setter
 public class CodeUnCheckException extends RuntimeException implements CodeException {
