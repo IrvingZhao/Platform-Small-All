@@ -134,16 +134,16 @@ public final class WeChartMpClient {
     }
 
     public static <T extends BaseSendInputMessage> T sendMessage(String configName, BaseSendOutputMessage<T> outputMessage) {
-        if (me.tokenManager == null || me.configManager == null) {
-            me.init();
-        }
-        if (BaseMpSendOutputMessage.class.isInstance(outputMessage)) {
+        if (outputMessage instanceof BaseMpSendOutputMessage) {// 当消息需要使用 token时，初始化tokenManager  并设置 token
+            if (me.tokenManager == null || me.configManager == null) {
+                me.init();
+            }
             String token = me.tokenManager.getToken(configName);
             ((BaseMpSendOutputMessage) outputMessage).setAccessToken(token);
         }
         T inputMessage = messageSender.sendMessage(outputMessage);
 
-        if (BaseMpSendInputMessage.class.isInstance(inputMessage)) {//添加刷新机制
+        if (inputMessage instanceof BaseMpSendInputMessage) {//添加刷新机制
             BaseMpSendInputMessage sendInputMessage = (BaseMpSendInputMessage) inputMessage;
             if ("40001".equals(sendInputMessage.getErrCode()) || "40014".equals(sendInputMessage.getErrCode()) || "42001".equals(sendInputMessage.getErrCode())) {
                 me.logger.info("token need refresh by code [" + sendInputMessage.getErrCode() + "], reason [" + sendInputMessage.getErrMsg() + "]");
