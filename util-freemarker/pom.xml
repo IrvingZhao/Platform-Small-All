@@ -15,12 +15,12 @@
         <dependency>
             <groupId>cn.irving.zhao.platform</groupId>
             <artifactId>core-spring</artifactId>
-            <version>1.0.0</version>
+            <version>${platform.version}</version>
         </dependency>
         <dependency>
             <groupId>cn.irving.zhao.platform</groupId>
             <artifactId>util-base</artifactId>
-            <version>1.0.0</version>
+            <version>${platform.version}</version>
         </dependency>
 
         <dependency>
