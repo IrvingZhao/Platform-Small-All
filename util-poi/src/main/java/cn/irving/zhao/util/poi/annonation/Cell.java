@@ -15,16 +15,22 @@ import java.lang.annotation.Target;
 public @interface Cell {
     /**
      * 行坐标
+     *
+     * @return 行坐标
      */
     int rowIndex();
 
     /**
      * 列坐标
+     *
+     * @return 列坐标
      */
     int colIndex();
 
     /**
      * 单元格数据类型，默认为字符串
+     *
+     * @return 单元格数据类型
      */
     CellDataType dataType() default CellDataType.AUTO;
 }

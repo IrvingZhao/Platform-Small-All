@@ -14,7 +14,7 @@ import java.io.InputStreamReader;
 /**
  * @author zhaojn1
  * @version Demo2.java, v 0.1 2018/3/19 zhaojn1
- * @project userProfile
+ * code>
  */
 public class Demo2 {
     public static void main(String[] args) throws Exception {

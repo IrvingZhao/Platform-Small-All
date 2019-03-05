@@ -14,7 +14,7 @@ public class NewsMaterial {
     @JsonProperty("media_id")
     private String mediaId;
 
-    private List<NewsItem> content;
+    private List<NewsItem> content;//TODO  content 为对象
 
     @JsonProperty("update_time")
     private Date updateTime;

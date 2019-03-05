@@ -12,7 +12,10 @@ public interface LoginUrlGenerator {
     String getRedirectUrl(HttpServletRequest request, HttpServletResponse response);
 
     /**
-     * 拼接url参数，以&开始
+     * 拼接url参数，以&amp;开始
+     *
+     * @param params url跳转参数
+     * @return 参数拼接结果
      */
     default String getExtraParam(Map<String, String> params) {
         StringBuilder builder = new StringBuilder();

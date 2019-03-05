@@ -51,6 +51,8 @@ public class SendTemplateOutputMessage extends BaseMpSendOutputMessage<SendTempl
 
     /**
      * 配置重定向小程序
+     * @param appId 小程序 appid
+     * @param path 跳转地址
      */
     public void setMiniProgramConfig(String appId, String path) {
         this.miniProgramConfig = new MiniProgramConfig(appId, path);

@@ -15,7 +15,6 @@ import java.io.File;
 /**
  * @author zhaojn1
  * @version AddTempMaterialOutputMessage.java, v 0.1 2018/3/19 zhaojn1
- * @project userProfile
  */
 @Getter
 @Setter

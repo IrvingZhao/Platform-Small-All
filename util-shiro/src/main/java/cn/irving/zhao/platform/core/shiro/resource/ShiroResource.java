@@ -6,6 +6,7 @@ public interface ShiroResource {
 
     /**
      * 请求地址
+     * @return 资源匹配地址
      */
     String getPath();
 
@@ -19,6 +20,7 @@ public interface ShiroResource {
      *     }
      *     等同于在配置文件中写，当前资源= roles["角色A","角色B"],perms["per:query"]
      * </pre>
+     * @return 资源所需权限
      */
     Map<String, String> getPerms();
 

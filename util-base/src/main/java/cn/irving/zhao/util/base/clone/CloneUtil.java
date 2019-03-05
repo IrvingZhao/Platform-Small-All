@@ -35,6 +35,7 @@ public final class CloneUtil {
      * <p>克隆失败后，会返回原有对象</p>
      *
      * @param source 需要被克隆的对象
+     * @param <T>      实现Serializable的接口对象
      * @return 克隆后对象
      */
     public <T extends Serializable> T clone(T source) {
@@ -62,6 +63,7 @@ public final class CloneUtil {
      * <p>克隆失败后，会返回原有对象</p>
      *
      * @param source 需要被克隆的对象
+     * @param <T> 实现Cloneable接口类型
      * @return 克隆后对象
      */
     public <T extends Cloneable> T clone(T source) {

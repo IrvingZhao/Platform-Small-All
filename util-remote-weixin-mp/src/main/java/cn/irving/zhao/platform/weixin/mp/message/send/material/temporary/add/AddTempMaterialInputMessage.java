@@ -9,7 +9,6 @@ import lombok.Setter;
 /**
  * @author zhaojn1
  * @version AddTempMaterialInputMessage.java, v 0.1 2018/3/19 zhaojn1
- * @project userProfile
  */
 @Getter
 @Setter

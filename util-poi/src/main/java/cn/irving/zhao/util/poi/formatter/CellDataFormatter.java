@@ -27,6 +27,13 @@ public interface CellDataFormatter {
 
     /**
      * 单元格数据解析方法
+     * //TODO 方法使用位置检查
+     *
+     * @param source     存放对象
+     * @param cellConfig 单元格配置信息
+     * @param rowIv      行偏移量
+     * @param colIv      列偏移量
+     * @return 存放数据对象
      */
     default Object parse(Object source, CellConfig cellConfig, int rowIv, int colIv) {
         return source;

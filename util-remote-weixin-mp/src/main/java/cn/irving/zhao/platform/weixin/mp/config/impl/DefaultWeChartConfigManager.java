@@ -12,18 +12,16 @@ import java.util.regex.Pattern;
 
 /**
  * 默认加载，读取Properties配置信息
- * <p>
- *     name为配置key，读取配置时使用，其他项对应微信开发配置中的各项内容。
- *     配置内容：
- *     <ul>
- *         <li>wx.&lt;name&gt;.appId</li>
- *         <li>wx.&lt;name&gt;.appSecurity</li>
- *         <li>wx.&lt;name&gt;.securityToken</li>
- *         <li>wx.&lt;name&gt;.encodingAesKey</li>
- *         <li>wx.&lt;name&gt;.messageType</li>
- *     </ul>
- * </p>
- * */
+ * name为配置key，读取配置时使用，其他项对应微信开发配置中的各项内容。
+ * 配置内容：
+ * <ul>
+ * <li>wx.&lt;name&gt;.appId</li>
+ * <li>wx.&lt;name&gt;.appSecurity</li>
+ * <li>wx.&lt;name&gt;.securityToken</li>
+ * <li>wx.&lt;name&gt;.encodingAesKey</li>
+ * <li>wx.&lt;name&gt;.messageType</li>
+ * </ul>
+ */
 public class DefaultWeChartConfigManager implements WeChartConfigManager {
 
     private Pattern configPattern = Pattern.compile("wx\\.(.*)\\.(.*)");

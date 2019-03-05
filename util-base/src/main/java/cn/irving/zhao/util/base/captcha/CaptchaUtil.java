@@ -25,6 +25,7 @@ public class CaptchaUtil {
      * @param w      宽
      * @param h      高
      * @param length 验证码长度
+     * @return 验证码对象
      */
     public static Captcha generateCaptcha(int w, int h, int length) {
         String code = RandomStringUtil.ALL_CHAR.generateString(length);
@@ -37,6 +38,7 @@ public class CaptchaUtil {
      * @param w    宽
      * @param h    高
      * @param code 验证码
+     * @return 验证码对象
      */
     public static Captcha generateCaptcha(int w, int h, String code) {
         BufferedImage image = me.generateImage(w, h, code);

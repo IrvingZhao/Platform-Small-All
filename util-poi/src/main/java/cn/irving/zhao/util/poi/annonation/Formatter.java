@@ -16,11 +16,15 @@ public @interface Formatter {
 
     /**
      * 单元格内数据格式化方法
+     *
+     * @return 单元格格式化工具类
      */
     Class<? extends CellDataFormatter> cellDataFormatter() default CellDataFormatter.class;
 
     /**
      * excel中单元格格式化字符串
+     *
+     * @return 单元格格式化字符串
      */
     String cellFormatPattern() default "";
 

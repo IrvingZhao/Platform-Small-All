@@ -171,6 +171,7 @@ public final class Button {
      * @param url      不支持小程序的客户端打开的地址
      * @param appId    小程序appId
      * @param pagePath 小程序地址
+     * @return 菜单按钮实例
      */
     public static Button generateMiniProgramButton(String name, String url, String appId, String pagePath) {
         Button result = new Button();
@@ -186,6 +187,7 @@ public final class Button {
      * 添加子菜单
      *
      * @param button 子菜单对象
+     * @return 当前对象
      */
     public Button addSubButton(Button button) {
         if (subButton == null) {

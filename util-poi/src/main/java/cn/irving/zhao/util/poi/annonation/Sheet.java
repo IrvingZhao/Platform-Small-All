@@ -18,6 +18,8 @@ public @interface Sheet {
 
     /**
      * 工作簿类型，默认值为{@link SheetType#OUTER}
+     *
+     * @return 工作簿类型
      */
     SheetType type() default SheetType.OUTER;
 
@@ -30,6 +32,8 @@ public @interface Sheet {
 
     /**
      * 工作表名称
+     *
+     * @return 工作表名称
      */
     Class<? extends SheetNameFormatter> nameFormatter() default DefaultSheetNameFormatter.class;
 

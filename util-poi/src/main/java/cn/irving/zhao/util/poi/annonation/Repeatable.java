@@ -17,11 +17,15 @@ public @interface Repeatable {
 
     /**
      * 循环方向
+     *
+     * @return 循环方向
      */
     Direction direction() default Direction.VERTICALLY;
 
     /**
      * 每次递增数值
+     *
+     * @return 自增值
      */
     int identity() default 1;
 
@@ -30,16 +34,22 @@ public @interface Repeatable {
      * <p>
      * -1不限制
      * </p>
+     *
+     * @return 最大循环次数
      */
     int max() default -1;
 
     /**
      * 集合具体实现类，读取时使用
+     *
+     * @return 集合实现类
      */
     Class<? extends Collection> collectionType() default Collection.class;
 
     /**
      * 单个元素的具体实现类，读取时使用
+     *
+     * @return 集合元素类
      */
     Class<?> itemType() default Object.class;
 

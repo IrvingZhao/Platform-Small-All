@@ -13,11 +13,15 @@ public interface ShiroUser {
 
     /**
      * 用户具备的角色
+     *
+     * @return 用户角色
      */
     Collection<String> getRoles();
 
     /**
      * 获得用户所具备的权限
+     *
+     * @return 用户权限
      */
     Collection<String> getPerms();
 

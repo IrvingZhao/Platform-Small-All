@@ -16,11 +16,15 @@ public @interface MergedRegion {
 
     /**
      * 目标单元格行坐标
+     *
+     * @return 目标行坐标
      */
     int endRowIndex();
 
     /**
      * 目标单元格列坐标
+     *
+     * @return 目标列坐标
      */
     int endColIndex();
 
