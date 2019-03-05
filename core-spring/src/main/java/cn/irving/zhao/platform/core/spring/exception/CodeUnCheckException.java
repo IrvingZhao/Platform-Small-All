@@ -12,6 +12,21 @@ public class CodeUnCheckException extends RuntimeException implements CodeExcept
 
     private String code;
 
+    public CodeUnCheckException(ErrorCode errorCode) {
+        super(errorCode.getMsg());
+        this.code = errorCode.getCode();
+    }
+
+    public CodeUnCheckException(ErrorCode errorCode, Throwable cause) {
+        super(errorCode.getCode(), cause);
+        this.code = errorCode.getCode();
+    }
+
+    public CodeUnCheckException(ErrorCode errorCode, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+        super(errorCode.getMsg(), cause, enableSuppression, writableStackTrace);
+        this.code = errorCode.getCode();
+    }
+
     public CodeUnCheckException(String code) {
         this.code = code;
     }
