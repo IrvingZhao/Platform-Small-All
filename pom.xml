@@ -6,7 +6,7 @@
 
     <groupId>cn.irving.zhao.platform</groupId>
     <artifactId>platform-parent</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
     <modules>
         <module>core-dao</module>
         <module>core-spring</module>
@@ -17,13 +17,13 @@
         <module>util-remote-mina</module>
         <module>util-remote-weixin-base</module>
         <module>util-remote-weixin-mp</module>
-        <module>util-remote-netty</module>
+        <!--<module>util-remote-netty</module>-->
         <module>util-shiro</module>
     </modules>
     <packaging>pom</packaging>
 
     <properties>
-        <platform.version>1.0.1</platform.version>
+        <platform.version>1.0.2</platform.version>
         <java.compile.plugin.version>3.7.0</java.compile.plugin.version>
         <resource.compile.plugin.version>3.0.2</resource.compile.plugin.version>
         <war.package.plugin.version>3.2.0</war.package.plugin.version>
@@ -106,12 +106,12 @@
         <repository>
             <id>xlb-release</id>
             <name>xlb-release</name>
-            <url>http://mvn.gaogeche.cn:81/repository/xlb-release/</url>
+            <url>http://mvn.gaogeche.cn/repository/xlb-release/</url>
         </repository>
         <snapshotRepository>
             <id>xlb-snapshot</id>
             <name>xlb-snapshot</name>
-            <url>http://mvn.gaogeche.cn:81/repository/xlb-snapshot/</url>
+            <url>http://mvn.gaogeche.cn/repository/xlb-snapshot/</url>
         </snapshotRepository>
     </distributionManagement>
 

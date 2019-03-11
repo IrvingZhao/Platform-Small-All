@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.util.Map;
 
 /**
- * <p>Equivalent to {@link org.apache.shiro.web.tags.RoleTag}</p>
  */
 public abstract class RoleTag extends SecureTag {
     String getName(Map params) {

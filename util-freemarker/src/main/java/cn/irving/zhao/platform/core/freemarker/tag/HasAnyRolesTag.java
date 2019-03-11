@@ -24,8 +24,6 @@ import org.apache.shiro.subject.Subject;
 /**
  * Displays body content if the current user has any of the roles specified.
  *
- * <p>Equivalent to {@link org.apache.shiro.web.tags.HasAnyRolesTag}</p>
- *
  * @since 0.2
  */
 public class HasAnyRolesTag extends RoleTag {

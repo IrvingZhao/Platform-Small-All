@@ -16,8 +16,6 @@ import java.util.Map;
  * <p>The logically opposite tag of this one is the {@link UserTag}.  Please read that class's JavaDoc as it explains
  * more about the differences between Authenticated/Unauthenticated and User/Guest semantic differences.
  *
- * <p>Equivalent to {@link org.apache.shiro.web.tags.GuestTag}</p>
- *
  * @since 0.9
  */
 public class GuestTag extends SecureTag {

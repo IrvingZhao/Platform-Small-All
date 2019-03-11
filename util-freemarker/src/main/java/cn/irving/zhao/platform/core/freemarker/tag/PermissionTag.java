@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.util.Map;
 
 /**
- * <p>Equivalent to {@link org.apache.shiro.web.tags.PermissionTag}</p>
  */
 public abstract class PermissionTag extends SecureTag {
     String getName(Map params) {

@@ -20,8 +20,6 @@ import java.util.Map;
  *
  * <p>The logically opposite tag of this one is the {@link NotAuthenticatedTag}
  *
- * <p>Equivalent to {@link org.apache.shiro.web.tags.AuthenticatedTag}</p>
- *
  * @since 0.2
  */
 public class AuthenticatedTag extends SecureTag {

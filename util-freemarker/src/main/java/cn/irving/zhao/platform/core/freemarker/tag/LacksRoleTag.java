@@ -1,7 +1,6 @@
 package cn.irving.zhao.platform.core.freemarker.tag;
 
 /**
- * <p>Equivalent to {@link org.apache.shiro.web.tags.LacksRoleTag}</p>
  */
 public class LacksRoleTag extends RoleTag {
     protected boolean showTagBody(String roleName) {

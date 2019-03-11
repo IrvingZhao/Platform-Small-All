@@ -3,6 +3,8 @@ package cn.irving.zhao.platform.core.spring.exception;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.text.MessageFormat;
+
 /**
  * 带错误编码的检查异常
  */
@@ -12,18 +14,18 @@ public class CodeCheckException extends Exception implements CodeException {
 
     private String code;
 
-    public CodeCheckException(ErrorCode errorCode) {
-        super(errorCode.getMsg());
+    public CodeCheckException(ErrorCode errorCode, Object... args) {
+        super(MessageFormat.format(errorCode.getMsg(), args));
         this.code = errorCode.getCode();
     }
 
-    public CodeCheckException(ErrorCode errorCode, Throwable cause) {
-        super(errorCode.getCode(), cause);
+    public CodeCheckException(ErrorCode errorCode, Throwable cause, Object... args) {
+        super(MessageFormat.format(errorCode.getMsg(), args), cause);
         this.code = errorCode.getCode();
     }
 
-    public CodeCheckException(ErrorCode errorCode, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(errorCode.getMsg(), cause, enableSuppression, writableStackTrace);
+    public CodeCheckException(ErrorCode errorCode, Throwable cause, boolean enableSuppression, boolean writableStackTrace, Object... args) {
+        super(MessageFormat.format(errorCode.getMsg(), args), cause, enableSuppression, writableStackTrace);
         this.code = errorCode.getCode();
     }
 
@@ -31,13 +33,13 @@ public class CodeCheckException extends Exception implements CodeException {
         this.code = code;
     }
 
-    public CodeCheckException(String code, String message) {
-        super(message);
+    public CodeCheckException(String code, String message, Object... args) {
+        super(MessageFormat.format(message, args));
         this.code = code;
     }
 
-    public CodeCheckException(String code, String message, Throwable cause) {
-        super(message, cause);
+    public CodeCheckException(String code, String message, Throwable cause, Object... args) {
+        super(MessageFormat.format(message, args), cause);
         this.code = code;
     }
 
@@ -46,8 +48,8 @@ public class CodeCheckException extends Exception implements CodeException {
         this.code = code;
     }
 
-    public CodeCheckException(String code, String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
+    public CodeCheckException(String code, String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace, Object... args) {
+        super(MessageFormat.format(message, args), cause, enableSuppression, writableStackTrace);
         this.code = code;
     }
 }

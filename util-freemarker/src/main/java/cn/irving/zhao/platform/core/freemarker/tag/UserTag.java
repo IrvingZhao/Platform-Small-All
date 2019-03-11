@@ -18,9 +18,6 @@ import java.util.Map;
  * guarantees that the current user has logged in <em>during their current session</em>, proving they really are
  * who they say they are.
  *
- * <p>The logically opposite tag of this one is the {@link org.apache.shiro.web.tags.GuestTag}.
- *
- * <p>Equivalent to {@link org.apache.shiro.web.tags.UserTag}</p>
  */
 public class UserTag extends SecureTag {
     static final Logger log = Logger.getLogger("UserTag");

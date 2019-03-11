@@ -16,15 +16,13 @@ import java.util.Map;
  * <p>Tag used to print out the String value of a user's default principal,
  * or a specific principal as specified by the tag's attributes.</p>
  *
- * <p> If no attributes are specified, the tag prints out the <tt>toString()</tt>
- * value of the user's default principal.  If the <tt>type</tt> attribute
+ * <p> If no attributes are specified, the tag prints out the <code>toString()</code>
+ * value of the user's default principal.  If the <code>type</code> attribute
  * is specified, the tag looks for a principal with the given type.  If the
- * <tt>property</tt> attribute is specified, the tag prints the string value of
+ * <code>property</code> attribute is specified, the tag prints the string value of
  * the specified property of the principal.  If no principal is found or the user
- * is not authenticated, the tag displays nothing unless a <tt>defaultValue</tt>
+ * is not authenticated, the tag displays nothing unless a <code>defaultValue</code>
  * is specified.</p>
- *
- * <p>Equivalent to {@link org.apache.shiro.web.tags.PrincipalTag}</p>
  *
  * @since 0.2
  */
@@ -39,7 +37,7 @@ public class PrincipalTag extends SecureTag {
     }
 
     /**
-     * The property name to retrieve of the principal, or null if the <tt>toString()</tt> value should be used.
+     * The property name to retrieve of the principal, or null if the <code>toString()</code> value should be used.
      */
     String getProperty(Map params) {
         return getParam(params, "property");
