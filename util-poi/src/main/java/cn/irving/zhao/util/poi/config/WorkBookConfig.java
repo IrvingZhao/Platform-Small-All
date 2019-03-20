@@ -1,25 +1,23 @@
 package cn.irving.zhao.util.poi.config;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * 工作簿配置信息
  */
+@Getter
+@Setter
 public class WorkBookConfig {
 
-    private List<SheetConfig> sheetConfigs;//工作簿内的工作表配置信息
+    private final List<SheetConfig> sheetConfigs = new ArrayList<>();//工作簿内的工作表配置信息
 
     private SheetConfig defaultSheetConfig;//默认工作表配置信息
 
     public void addSheetConfig(SheetConfig sheetConfig) {
-        if (sheetConfigs == null) {
-            synchronized (this) {
-                if (sheetConfigs == null) {
-                    sheetConfigs = new ArrayList<>();
-                }
-            }
-        }
         sheetConfigs.add(sheetConfig);
     }
 
@@ -45,19 +43,4 @@ public class WorkBookConfig {
         defaultSheetConfig.addSheetConfig(sheetConfig);
     }
 
-    public List<SheetConfig> getSheetConfigs() {
-        return sheetConfigs;
-    }
-
-    public void setSheetConfigs(List<SheetConfig> sheetConfigs) {
-        this.sheetConfigs = sheetConfigs;
-    }
-
-    public SheetConfig getDefaultSheetConfig() {
-        return defaultSheetConfig;
-    }
-
-    public void setDefaultSheetConfig(SheetConfig defaultSheetConfig) {
-        this.defaultSheetConfig = defaultSheetConfig;
-    }
 }
