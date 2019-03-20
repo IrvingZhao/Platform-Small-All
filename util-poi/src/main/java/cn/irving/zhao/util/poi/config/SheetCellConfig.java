@@ -1,11 +1,16 @@
 package cn.irving.zhao.util.poi.config;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * 工作表内单元格配置信息
  */
+@Getter
+@Setter
 public class SheetCellConfig {
     private final List<CellConfig> cellConfigs = new ArrayList<>();//单元格配置信息
 
@@ -22,14 +27,6 @@ public class SheetCellConfig {
     public SheetCellConfig addSheetConfig(SheetConfig sheetConfig) {
         refSheetConfigs.add(sheetConfig);
         return this;
-    }
-
-    public List<CellConfig> getCellConfigs() {
-        return cellConfigs;
-    }
-
-    public List<SheetConfig> getRefSheetConfigs() {
-        return refSheetConfigs;
     }
 
 }

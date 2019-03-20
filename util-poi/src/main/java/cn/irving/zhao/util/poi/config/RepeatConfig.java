@@ -2,6 +2,8 @@ package cn.irving.zhao.util.poi.config;
 
 import cn.irving.zhao.util.poi.annonation.Repeatable;
 import cn.irving.zhao.util.poi.enums.Direction;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -9,6 +11,8 @@ import java.util.Collection;
 /**
  * 循环配置信息
  */
+@Getter
+@Setter
 public class RepeatConfig implements Serializable {
 
     RepeatConfig(Repeatable repeatable) {
@@ -41,23 +45,4 @@ public class RepeatConfig implements Serializable {
 
     private final Class<?> itemType;
 
-    public int getIdentity() {
-        return identity;
-    }
-
-    public Direction getDirection() {
-        return direction;
-    }
-
-    public int getMax() {
-        return max;
-    }
-
-    public Class<? extends Collection> getCollectionType() {
-        return collectionType;
-    }
-
-    public Class<?> getItemType() {
-        return itemType;
-    }
 }

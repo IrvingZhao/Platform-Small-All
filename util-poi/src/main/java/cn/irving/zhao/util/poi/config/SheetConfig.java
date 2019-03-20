@@ -5,6 +5,8 @@ import cn.irving.zhao.util.poi.enums.SheetType;
 import cn.irving.zhao.util.poi.exception.ExportException;
 import cn.irving.zhao.util.poi.formatter.SheetNameFormatter;
 import cn.irving.zhao.util.poi.formatter.FormatterFactory;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -12,6 +14,8 @@ import java.util.function.Function;
 /**
  * 工作表配置信息
  */
+@Getter
+@Setter
 public class SheetConfig {
 
     private static FormatterFactory<SheetNameFormatter> factory = FormatterFactory.getFormatterFactory(SheetNameFormatter.class);
@@ -117,87 +121,6 @@ public class SheetConfig {
         dataSetter.accept(source, data);
     }
 
-    public SheetType getSheetType() {
-        return sheetType;
-    }
-
-    public void setSheetType(SheetType sheetType) {
-        this.sheetType = sheetType;
-    }
-
-    public SheetCellConfig getSheetCellConfig() {
-        return sheetCellConfig;
-    }
-
-    public void setSheetCellConfig(SheetCellConfig sheetCellConfig) {
-        this.sheetCellConfig = sheetCellConfig;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getBaseRow() {
-        return baseRow;
-    }
-
-    public void setBaseRow(int baseRow) {
-        this.baseRow = baseRow;
-    }
-
-    public int getBaseCol() {
-        return baseCol;
-    }
-
-    public void setBaseCol(int baseCol) {
-        this.baseCol = baseCol;
-    }
-
-    public RepeatConfig getRepeatConfig() {
-        return repeatConfig;
-    }
-
-    public void setRepeatConfig(RepeatConfig repeatConfig) {
-        this.repeatConfig = repeatConfig;
-    }
-
-    public Function getDataGetter() {
-        return dataGetter;
-    }
-
-    public void setDataGetter(Function<Object, Object> dataGetter) {
-        this.dataGetter = dataGetter;
-    }
-
-    public SheetNameFormatter getSheetNameFormatter() {
-        return sheetNameFormatter;
-    }
-
-    public void setSheetNameFormatter(SheetNameFormatter sheetNameFormatter) {
-        this.sheetNameFormatter = sheetNameFormatter;
-    }
-
-    public BiConsumer<Object, Object> getDataSetter() {
-        return dataSetter;
-    }
-
-    public SheetConfig setDataSetter(BiConsumer<Object, Object> dataSetter) {
-        this.dataSetter = dataSetter;
-        return this;
-    }
-
-    public Class<?> getDataType() {
-        return dataType;
-    }
-
-    public SheetConfig setDataType(Class<?> dataType) {
-        this.dataType = dataType;
-        return this;
-    }
 }
 
 

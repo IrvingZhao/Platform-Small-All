@@ -3,10 +3,14 @@ package cn.irving.zhao.util.poi.config;
 import cn.irving.zhao.util.poi.annonation.Formatter;
 import cn.irving.zhao.util.poi.formatter.CellDataFormatter;
 import cn.irving.zhao.util.poi.formatter.FormatterFactory;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * 单元格格式化配置信息
  */
+@Getter
+@Setter
 public class FormatterConfig {
 
     private static FormatterFactory<CellDataFormatter> factory = FormatterFactory.getFormatterFactory(CellDataFormatter.class);
@@ -52,11 +56,4 @@ public class FormatterConfig {
 
     private final CellDataFormatter cellDataFormatter;//单元格格式化转换
 
-    public String getFormatString() {
-        return formatString;
-    }
-
-    public CellDataFormatter getCellDataFormatter() {
-        return cellDataFormatter;
-    }
 }

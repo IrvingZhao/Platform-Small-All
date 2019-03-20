@@ -1,8 +1,13 @@
 package cn.irving.zhao.util.poi.config;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * 单元格合并配置信息
  */
+@Getter
+@Setter
 public class MergedConfig {
 
     public MergedConfig(int startRowIndex, int startColIndex, int endRowIndex, int endColIndex) {
@@ -17,21 +22,5 @@ public class MergedConfig {
 
     private final int endRowIndex;
     private final int endColIndex;
-
-    public int getStartRowIndex() {
-        return startRowIndex;
-    }
-
-    public int getStartColIndex() {
-        return startColIndex;
-    }
-
-    public int getEndRowIndex() {
-        return endRowIndex;
-    }
-
-    public int getEndColIndex() {
-        return endColIndex;
-    }
 
 }

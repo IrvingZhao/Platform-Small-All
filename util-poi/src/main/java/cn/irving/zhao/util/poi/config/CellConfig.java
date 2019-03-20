@@ -5,6 +5,8 @@ import cn.irving.zhao.util.poi.annonation.Formatter;
 import cn.irving.zhao.util.poi.annonation.MergedRegion;
 import cn.irving.zhao.util.poi.annonation.Repeatable;
 import cn.irving.zhao.util.poi.enums.CellDataType;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -12,6 +14,8 @@ import java.util.function.Function;
 /**
  * 单元格配置信息
  */
+@Getter
+@Setter
 public class CellConfig {
 
     CellConfig(Cell cell, Repeatable repeatable, MergedRegion mergedRegion, Formatter formatter, Function<Object, Object> dataGetter, BiConsumer<Object, Object> dataSetter, Class<?> type) {
@@ -61,31 +65,4 @@ public class CellConfig {
         dataSetter.accept(source, data);
     }
 
-    public int getRowIndex() {
-        return rowIndex;
-    }
-
-    public int getCellIndex() {
-        return cellIndex;
-    }
-
-    public RepeatConfig getRepeatConfig() {
-        return repeatConfig;
-    }
-
-    public MergedConfig getMergedConfig() {
-        return mergedConfig;
-    }
-
-    public CellDataType getDataType() {
-        return dataType;
-    }
-
-    public FormatterConfig getFormatterConfig() {
-        return formatterConfig;
-    }
-
-    public Class<?> getType() {
-        return type;
-    }
 }
