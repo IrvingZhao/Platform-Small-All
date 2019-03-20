@@ -198,7 +198,7 @@ public final class ExcelExporter extends ExcelOperator {
             Object data = sheetConfig.getData(source);
             Sheet writeDataSheet = null;
             //检查数据是否为一个集合类型
-            if (Iterable.class.isInstance(data)) {
+            if (data instanceof Iterable) {
                 //迭代循环次数
                 for (Object itemData : ((Iterable) data)) {
                     if (max > 0 && currentIndex >= max) {//最大循环次数判断
@@ -273,7 +273,7 @@ public final class ExcelExporter extends ExcelOperator {
             int max = repeatConfig.getMax();
             int identity = repeatConfig.getIdentity();
             Direction dir = repeatConfig.getDirection();
-            if (Iterable.class.isInstance(cellData)) {//检查循环写入的数据类型是否可迭代
+            if (cellData instanceof Iterable) {//检查循环写入的数据类型是否可迭代
                 try {
                     for (Object dataItem : ((Iterable) cellData)) {//迭代数据
                         if (max > 0 && currentIndex >= max) {//最大循环次数判断
@@ -353,17 +353,15 @@ public final class ExcelExporter extends ExcelOperator {
     private void writeCustomTypeCell(Cell cell, CellDataType dataType, Object cellData) throws ExportException {
         cell.setCellType(dataType.getCellType());//设置类型
         if (dataType == CellDataType.DATE) {
-            if (Calendar.class.isInstance(cellData)) {
+            if (cellData instanceof Calendar) {
                 cell.setCellValue((Calendar) cellData);
-            } else if (Date.class.isInstance(cellData)) {
+            } else if (cellData instanceof Date) {
                 cell.setCellValue((Date) cellData);
             } else {
                 throw new ExportException(cellData.getClass() + "不是一个Date或Calendar对象");
             }
         } else if (dataType == CellDataType.NUMERIC) {
-            if (int.class.isInstance(cellData) || long.class.isInstance(cellData) || double.class.isInstance(cellData)) {
-                cell.setCellValue((double) cellData);
-            } else if (Number.class.isInstance(cellData)) {
+            if (cellData instanceof Number) {
                 cell.setCellValue(((Number) cellData).doubleValue());
             } else {
                 throw new ExportException(cellData.getClass() + "不是一个有效的数字类型");
@@ -382,21 +380,16 @@ public final class ExcelExporter extends ExcelOperator {
      * @param cellData 被写入数据
      */
     private void writeAutoTypeCell(Cell cell, Object cellData) {
-        if (Calendar.class.isInstance(cellData)) {
+        if (cellData instanceof Calendar) {
             cell.setCellType(CellType.NUMERIC);
             cell.setCellValue((Calendar) cellData);
-        } else if (Date.class.isInstance(cellData)) {
+        } else if (cellData instanceof Date) {
             cell.setCellType(CellType.NUMERIC);
             cell.setCellValue((Date) cellData);
-        } else if (double.class.isInstance(cellData)
-                || int.class.isInstance(cellData)
-                || long.class.isInstance(cellData)) { //基础数据类型，强制转换double后输出
-            cell.setCellType(CellType.NUMERIC);
-            cell.setCellValue((double) cellData);
-        } else if (Number.class.isInstance(cellData)) {//如果是数字类型，调用doubleValue 方法
+        } else if (cellData instanceof Number) {//如果是数字类型，调用doubleValue 方法
             cell.setCellType(CellType.NUMERIC);
             cell.setCellValue(((Number) cellData).doubleValue());
-        } else if (RichTextString.class.isInstance(cellData)) {
+        } else if (cellData instanceof RichTextString) {
             cell.setCellValue((RichTextString) cellData);
         } else {//其他类型，调用String.valueOf 转换成字符串后输出
             cell.setCellType(CellType.STRING);
