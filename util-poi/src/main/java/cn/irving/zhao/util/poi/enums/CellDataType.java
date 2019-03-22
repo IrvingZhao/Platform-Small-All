@@ -1,6 +1,5 @@
 package cn.irving.zhao.util.poi.enums;
 
-import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 
 /**

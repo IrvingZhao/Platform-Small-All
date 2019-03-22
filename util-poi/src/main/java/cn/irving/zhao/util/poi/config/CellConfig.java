@@ -7,7 +7,6 @@ import cn.irving.zhao.util.poi.formatter.MergedRegionFormatter;
 import cn.irving.zhao.util.poi.formatter.RepeatCheck;
 import cn.irving.zhao.util.poi.formatter.RepeatIVFormatter;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.util.Collection;
 import java.util.function.BiConsumer;
@@ -66,6 +65,7 @@ public class CellConfig {
      * @param collectionType 数据类型，读取excel时使用
      * @param itemType       单个数据类型，读取excel时使用
      * @param check          循环结束检查器，读取excel时使用
+     * @return 当前对象
      */
     public CellConfig setRepeatConfig(int rowIv, int colIv, int max, Class<? extends Collection> collectionType, Class<?> itemType, RepeatCheck check) {
         this.repeatConfig = new RepeatConfig(rowIv, colIv, max, collectionType, itemType, check);
@@ -80,6 +80,7 @@ public class CellConfig {
      * @param collectionType 数据类型，读取excel时使用
      * @param itemType       单个数据类型，读取excel时使用
      * @param check          循环结束检查器，读取excel时使用
+     * @return 当前对象
      */
     public CellConfig setRepeatConfig(RepeatIVFormatter formatter, int max, Class<? extends Collection> collectionType, Class<?> itemType, RepeatCheck check) {
         this.repeatConfig = new RepeatConfig(formatter, max, collectionType, itemType, check);
@@ -91,6 +92,7 @@ public class CellConfig {
      *
      * @param endRowIndex 合并结束行坐标
      * @param endColIndex 合并结束列坐标
+     * @return 当前对象
      */
     public CellConfig setMergedConfig(int endRowIndex, int endColIndex) {
         this.mergedConfig = new MergedConfig(this.rowIndex, this.cellIndex, endRowIndex, endColIndex);
@@ -101,6 +103,7 @@ public class CellConfig {
      * 单元格合并配置信息
      *
      * @param format 单元格合并坐标计算器
+     * @return 当前对象
      */
     public CellConfig setMeredConfig(MergedRegionFormatter format) {
         this.mergedConfig = new MergedConfig(this.rowIndex, this.cellIndex, format);
@@ -110,8 +113,9 @@ public class CellConfig {
     /**
      * 单元格数据格式化配置信息
      *
-     * @param formatString      单元格格式化字符串
+     * @param formatString      单元格格式化字符串，参照Excel格式设置
      * @param cellDataFormatter 数据格式化对象
+     * @return 当前对象
      */
     public CellConfig setFormatterConfig(String formatString, CellDataFormatter cellDataFormatter) {
         this.formatterConfig = new FormatterConfig(formatString, cellDataFormatter);
@@ -121,7 +125,8 @@ public class CellConfig {
     /**
      * 单元格数据格式化配置信息
      *
-     * @param formatString 单元格格式化字符串
+     * @param formatString 单元格格式化字符串，参照Excel格式设置
+     * @return 当前对象
      */
     public CellConfig setFormatterConfig(String formatString) {
         this.formatterConfig = new FormatterConfig(formatString);
@@ -132,6 +137,7 @@ public class CellConfig {
      * 单元格数据格式化配置信息
      *
      * @param cellDataFormatter 数据格式化对象
+     * @return 当前对象
      */
     public CellConfig setFormatterConfig(CellDataFormatter cellDataFormatter) {
         this.formatterConfig = new FormatterConfig(cellDataFormatter);
@@ -140,6 +146,9 @@ public class CellConfig {
 
     /**
      * 获取数据
+     *
+     * @param source 数据拥有对象
+     * @return 数据对象
      */
     public Object getData(Object source) {
         return dataGetter.apply(source);
@@ -147,6 +156,9 @@ public class CellConfig {
 
     /**
      * 设置数据
+     *
+     * @param source 数据拥有对象
+     * @param data   数据对象
      */
     public void setData(Object source, Object data) {
         dataSetter.accept(source, data);

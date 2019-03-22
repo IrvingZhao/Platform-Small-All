@@ -6,6 +6,7 @@ import org.apache.poi.ss.usermodel.Cell;
 /**
  * 单元格数据格式化
  */
+@FunctionalInterface
 public interface CellDataFormatter {
 
     /**
@@ -21,13 +22,10 @@ public interface CellDataFormatter {
      * @param colIv      列偏移量
      * @return 格式化后数据
      */
-    default Object format(Object source, CellConfig cellConfig, int rowIv, int colIv) {
-        return source;
-    }
+    Object format(Object source, CellConfig cellConfig, int rowIv, int colIv);
 
     /**
      * 单元格数据解析方法
-     * //TODO 方法使用位置检查
      *
      * @param source     存放对象
      * @param cellConfig 单元格配置信息

@@ -9,21 +9,21 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 工作簿配置
+ * 工作表配置
  */
 @Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Sheet {
 
     /**
-     * 工作簿类型，默认值为{@link SheetType#OUTER}
+     * 工作表类型，默认值为{@link SheetType#OUTER}
      *
-     * @return 工作簿类型
+     * @return 工作表类型
      */
     SheetType type() default SheetType.OUTER;
 
     /**
-     * 工作簿名称，只在{@link Sheet#type()} 为 {@link SheetType#OUTER} 时有效
+     * 工作表名称，只在{@link Sheet#type()} 为 {@link SheetType#OUTER} 时有效
      *
      * @return 默认值："Sheet"
      */

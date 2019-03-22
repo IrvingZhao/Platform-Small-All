@@ -5,7 +5,6 @@ import cn.irving.zhao.util.poi.formatter.FormatterFactory;
 import cn.irving.zhao.util.poi.formatter.RepeatCheck;
 import cn.irving.zhao.util.poi.formatter.RepeatIVFormatter;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -54,19 +53,24 @@ public class RepeatConfig implements Serializable {
         this.check = check;
     }
 
-    private int rowIv;
-    private int colIv;
+    private int rowIv;//行循环追加量
+    private int colIv;//列循环追加量
 
-    private int max;
+    private int max;//最大循环次数
 
-    private Class<? extends Collection> collectionType;
+    private Class<? extends Collection> collectionType;//集合具体类型
 
-    private Class<?> itemType;
+    private Class<?> itemType;//集合中单个元素的类型
 
-    private RepeatIVFormatter formatter;
+    private RepeatIVFormatter formatter;//循环行、列追加量计算器
 
-    private RepeatCheck check;
+    private RepeatCheck check;//循环结束检查器
 
+    /**
+     * 获取行、列叠加量
+     *
+     * @return [rowIv, colIv]
+     */
     public int[] getNextIv(int loop, Object source) {
         if (this.formatter == null) {
             return new int[]{rowIv, colIv};

@@ -5,7 +5,7 @@ import org.apache.commons.collections4.map.ReferenceMap;
 import java.lang.reflect.InvocationTargetException;
 
 /**
- * 工作表名称格式化对象工厂
+ * 各种格式化工具工厂类
  */
 public class FormatterFactory<T> {
     private FormatterFactory() {

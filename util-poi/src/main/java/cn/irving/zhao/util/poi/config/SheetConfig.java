@@ -180,6 +180,11 @@ public class SheetConfig {
         dataSetter.accept(source, data);
     }
 
+    void setCellAndRefSheet(SheetConfig config){
+        this.cellConfigs.addAll(config.cellConfigs);
+        this.refSheetConfigs.addAll(config.refSheetConfigs);
+    }
+
     private SheetType sheetType = SheetType.OUTER;//工作表类型
 
     private String name;//工作表名称

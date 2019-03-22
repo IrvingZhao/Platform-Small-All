@@ -39,13 +39,13 @@ public class MergedConfig {
         this.formatter = formatter;
     }
 
-    private int startRowIndex;
-    private int startColIndex;
+    private int startRowIndex;//合并开始行坐标
+    private int startColIndex;//合并开始列坐标
 
-    private int endRowIndex;
-    private int endColIndex;
+    private int endRowIndex;//合并结束行坐标
+    private int endColIndex;//合并结束列坐标
 
-    private MergedRegionFormatter formatter;
+    private MergedRegionFormatter formatter;//合并结束坐标计算器
 
     /**
      * 获得合并坐标

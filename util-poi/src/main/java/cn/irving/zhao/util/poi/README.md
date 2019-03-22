@@ -27,9 +27,9 @@ excelExporter.export(workbookContainer, "D:\\basepath\\a.xlsx", "");
 
 > 在单个属性的基础上，添加`cn.irving.zhao.util.poi.annonation.MergedPosition` 注解，并配置`endRowIndex` 结束行坐标，`endColIndex` 结束列坐标，合并单元格的行列坐标为：开始行 - Cell.rowIndex，开始列 - Cell.cellIndex，结束行endRowIndex，结束列endColIndex。注：当`MergedRegion` 与 `Repeatable` 同时使用时，每次合并的坐标在基础坐标的基础上，增加`Repeatable.identity`。
 
-##### 工作簿引入
+##### 工作表引入
 
-> 工作簿引入分为：外部引入，内部引入。外部引入：新创建一个工作簿并将对象中的内容写入至新的工作簿中，可进行多次循环创建引入。内部引入：将一个对象中的内容写入至当前工作簿中的指定位置。
+> 工作表引入分为：外部引入，内部引入。外部引入：新创建一个工作表并将对象中的内容写入至新的工作表中，可进行多次循环创建引入。内部引入：将一个对象中的内容写入至当前工作表中的指定位置。
 >
 > 在属性上添加`cn.irving.zhao.util.poi.annonation.Sheet` 注解，并配置`type` 引入方式，`name` 工作簿名称，`nameFormatter` 工作簿名称格式化类，`baseRow` 工作簿初始行，`baseCol` 工作簿初始列。
 >

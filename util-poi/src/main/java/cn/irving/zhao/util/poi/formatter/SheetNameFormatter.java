@@ -10,7 +10,7 @@ public interface SheetNameFormatter {
     /**
      * 格式化工作表名称
      *
-     * @param data      工作簿对应的数据
+     * @param data      工作表对应的数据
      * @param sheetName 工作表原有名称
      * @param loopIndex 循环第几次
      * @return 格式化后名称

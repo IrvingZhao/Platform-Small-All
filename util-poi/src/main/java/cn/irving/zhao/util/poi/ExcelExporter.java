@@ -143,37 +143,38 @@ public final class ExcelExporter {
     }
 
     /**
-     * 写入工作簿
+     * 写入工作表
      *
-     * @param workbook    工作表
-     * @param sheet       当前配置所对应的工作簿
-     * @param sheetConfig 当前工作簿配置信息
+     * @param workbook    工作簿
+     * @param sheet       当前配置所对应的工作表
+     * @param sheetConfig 当前工作表配置信息
      * @param source      当前待写入对象
      * @param rowIv       行修正量
      * @param colIv       列修正量
      */
     private void writeSheet(Workbook workbook, Sheet sheet, SheetConfig sheetConfig, Object source, int rowIv, int colIv) {
-        if (sheetConfig.getSheetType() == SheetType.INNER) {
-            //如果是内嵌工作簿，添加行、列修正量
+        //设置表格位移空间
+        if (sheetConfig.getSheetType() == SheetType.INNER) {//内部引入表格，位移叠加
+            //如果是内嵌工作表，添加行、列修正量
             rowIv += sheetConfig.getBaseRow();
             colIv += sheetConfig.getBaseCol();
-        } else if (sheetConfig.getSheetType() == SheetType.OUTER) {
+        } else if (sheetConfig.getSheetType() == SheetType.OUTER) {//外部引入，位置重置
             //设置 表格修正量
             rowIv = sheetConfig.getBaseRow();
             colIv = sheetConfig.getBaseCol();
         }
         var repeatConfig = sheetConfig.getRepeatConfig();
         if (repeatConfig == null) {
-            //非循环写入工作簿
+            //非循环写入工作表
             var data = sheetConfig.getData(source);
             Sheet writeDataSheet = null;
-            //根据工作簿配置创建具体写入工作簿对象
+            //根据工作表配置创建具体写入工作表对象
             if (sheetConfig.getSheetType() == SheetType.INNER) {
                 writeDataSheet = sheet;
             } else if (sheetConfig.getSheetType() == SheetType.OUTER) {
                 writeDataSheet = this.getWriteSheet(workbook, sheetConfig, data, 0);
             }
-            //将数据写入工作簿
+            //将数据写入工作表
             this.writeSheetData(workbook, writeDataSheet, sheetConfig, data, rowIv, colIv);
         } else {
             var max = repeatConfig.getMax();
@@ -187,7 +188,7 @@ public final class ExcelExporter {
                     if (max > 0 && currentIndex >= max) {//最大循环次数判断
                         break;
                     }
-                    //根据配置配置信息，创建对应工作簿
+                    //根据配置配置信息，创建对应工作表
                     if (sheetConfig.getSheetType() == SheetType.INNER) {
                         writeDataSheet = sheet;
                     } else if (sheetConfig.getSheetType() == SheetType.OUTER) {
@@ -196,6 +197,7 @@ public final class ExcelExporter {
                     //写入数据
                     this.writeSheetData(workbook, writeDataSheet, sheetConfig, itemData, rowIv, colIv);
 
+                    //计算循环位移量
                     var ivs = repeatConfig.getNextIv(currentIndex, source);
                     rowIv += ivs[0];
                     colIv += ivs[1];
@@ -208,8 +210,10 @@ public final class ExcelExporter {
 
     private void writeSheetData(Workbook workbook, Sheet sheet, SheetConfig sheetConfig, Object data, int rowIv, int colIv) {
 
+        //写入单元格
         sheetConfig.getCellConfigs().forEach((item) -> this.writeCell(workbook, sheet, item, data, rowIv, colIv));
 
+        //写入引用工作表
         sheetConfig.getRefSheetConfigs().forEach((item) -> this.writeSheet(workbook, sheet, item, data, rowIv, colIv));
     }
 
@@ -243,6 +247,7 @@ public final class ExcelExporter {
                         }
                         this.writeCellData(workbook, sheet, cellConfig, dataItem, rowIv, colIv, data);//写入单元格数据
 
+                        //设置循环位移量
                         var ivs = repeatConfig.getNextIv(currentIndex, data);
                         rowIv += ivs[0];
                         colIv += ivs[1];
@@ -285,7 +290,7 @@ public final class ExcelExporter {
         }
         var dataType = cellConfig.getDataType();//数据类型
         var formatterConfig = cellConfig.getFormatterConfig();//数据格式化配置
-        if (formatterConfig != null) {
+        if (formatterConfig != null) {//写入格式化配置
             var formatterPattern = formatterConfig.getFormatString();
             if (formatterPattern != null && !"".equals(formatterPattern)) {//设置excel中数据格式化的格式
                 this.getCellStyle(cell, workbook)
@@ -359,9 +364,9 @@ public final class ExcelExporter {
     /**
      * 获取写入配置信息
      *
-     * @param workbook    工作表
-     * @param sheetConfig 工作簿配置
-     * @param data        工作簿对应数据
+     * @param workbook    工作簿对象
+     * @param sheetConfig 工作表配置
+     * @param data        工作表对应数据
      * @param loopIndex   循环索引
      */
     private Sheet getWriteSheet(Workbook workbook, SheetConfig sheetConfig, Object data, Integer loopIndex) {

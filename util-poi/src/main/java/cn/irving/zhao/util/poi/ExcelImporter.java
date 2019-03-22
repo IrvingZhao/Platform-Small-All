@@ -18,6 +18,13 @@ public class ExcelImporter {
 
     private static final ExcelImporter me = new ExcelImporter();
 
+    /**
+     * 读取Excel工作簿
+     *
+     * @param type   读取对象类型
+     * @param stream 读取文件流
+     * @return 读取结果对象
+     */
     public static <T> T readExcel(Class<T> type, InputStream stream) {
         try {
             Workbook workbook = WorkbookFactory.create(stream);
@@ -27,13 +34,20 @@ public class ExcelImporter {
         }
     }
 
+    /**
+     * 读取Excel工作簿
+     *
+     * @param type     读取对象类型
+     * @param workbook 工作簿对象
+     * @return 读取结果
+     */
     public static <T> T readExcel(Class<T> type, Workbook workbook) {
         try {
-            var result = type.getConstructor().newInstance();
-            var config = WorkBookConfigFactory.getWorkBookConfig(result);
+            var result = type.getConstructor().newInstance();//创建返回结果
+            var config = WorkBookConfigFactory.getWorkBookConfig(result);//获取工作簿配置信息
 
             config.getSheetConfigs().forEach((item) -> {
-                me.readOneSheet(workbook, null, item, result, 0, 0);
+                me.readOneSheet(workbook, null, item, result, 0, 0);//依次读取工作簿中的工作表
             });
 
             return result;
@@ -44,14 +58,14 @@ public class ExcelImporter {
     }
 
     private boolean readOneSheet(Workbook workbook, Sheet sheet, SheetConfig sheetConfig, Object source, int rowIv, int colIv) {
-        if (sheetConfig.getSheetType() == SheetType.INNER) {
+        if (sheetConfig.getSheetType() == SheetType.INNER) {//工作表位移
             rowIv += sheetConfig.getBaseRow();
             colIv += sheetConfig.getBaseCol();
         } else {
             rowIv = sheetConfig.getBaseRow();
             colIv = sheetConfig.getBaseCol();
         }
-        var repeatConfig = sheetConfig.getRepeatConfig();
+        var repeatConfig = sheetConfig.getRepeatConfig();//循环读取配置
         if (repeatConfig == null) {
 
             Sheet readSheet;
@@ -60,22 +74,23 @@ public class ExcelImporter {
             } else {
                 readSheet = getReadSheet(workbook, source, sheetConfig, 0);
             }
-            if (readSheet == null) {
+            //选定需读取的工作表
+            if (readSheet == null) {//工作表未找到时，返回false，配置读取失败
                 return false;
             }
 
-            var readObject = this.getWriteObj(sheetConfig, source);
+            var readObject = this.getWriteObj(sheetConfig, source);//获得工作表数据写入对象
 
-            this.readSheetData(workbook, readSheet, sheetConfig, readObject, rowIv, colIv);//检查单元格读取结果
+            this.readSheetData(workbook, readSheet, sheetConfig, readObject, rowIv, colIv);//读取配置中的信息
 
         } else {
             var max = repeatConfig.getMax();
             var currentIndex = 0;
-            var collectionData = this.getCollectionInstance(repeatConfig.getCollectionType(), sheetConfig.getDataType());
+            var collectionData = this.getCollectionInstance(repeatConfig.getCollectionType(), sheetConfig.getDataType());//构建集合类
 
-            sheetConfig.setData(source, collectionData);
+            sheetConfig.setData(source, collectionData);//设置对象
 
-            var itemDataType = repeatConfig.getItemType();
+            var itemDataType = repeatConfig.getItemType();//单个元素类型
 
             while (true) {
                 if (max > 0 && currentIndex >= max) {
@@ -83,16 +98,18 @@ public class ExcelImporter {
                 }
 
                 Sheet dataSheet = null;
-                //设置工作簿数据源
+                //设置工作表数据源
                 if (sheetConfig.getSheetType() == SheetType.INNER) {
                     dataSheet = sheet;
                 } else if (sheetConfig.getSheetType() == SheetType.OUTER) {
                     dataSheet = getReadSheet(workbook, source, sheetConfig, currentIndex);
                 }
+                //工作表未找到时，跳出
                 if (dataSheet == null) {
                     break;
                 }
 
+                //构建单个对象
                 Object itemData = null;
                 try {
                     itemData = itemDataType.getConstructor().newInstance();
@@ -100,20 +117,22 @@ public class ExcelImporter {
                     e.printStackTrace();
                 }
 
+                //读取单个对象数据
                 var readSheetResult = this.readSheetData(workbook, dataSheet, sheetConfig, itemData, rowIv, colIv);
 
-                if (!readSheetResult) {
+                if (!readSheetResult) {//读取失败时，跳出
                     break;
                 }
 
-                collectionData.add(itemData);
+                collectionData.add(itemData);//对象加入集合中
 
-                if (repeatConfig.getCheck() != null) {
-                    if (!repeatConfig.getCheck().checkRepeat(sheet, currentIndex, rowIv, colIv)) {
+                if (repeatConfig.getCheck() != null) {//检查循环配置项中，是否有动态循环结束配置
+                    if (!repeatConfig.getCheck().checkRepeat(sheet, currentIndex, rowIv, colIv)) {//执行检查
                         break;
                     }
                 }
 
+                //设置行列位移量
                 int[] ivs = repeatConfig.getNextIv(currentIndex, source);
 
                 rowIv += ivs[0];
@@ -128,28 +147,28 @@ public class ExcelImporter {
         return false;
     }
 
+    //读取工作表数据
     private boolean readSheetData(Workbook workbook, Sheet sheet, SheetConfig sheetConfig, Object source, int rowIv, int colIv) {
         List<Boolean> results = new ArrayList<>();
 
-        sheetConfig.getCellConfigs().stream().map((item) -> {
-            return this.readCell(sheet, item, source, rowIv, colIv);
-        }).forEach(results::add);
+        //读取工作表中单元格数据
+        sheetConfig.getCellConfigs().stream().map((item) -> this.readCell(sheet, item, source, rowIv, colIv)).forEach(results::add);
 
-        sheetConfig.getRefSheetConfigs().stream().map((item) -> {
-            return this.readOneSheet(workbook, sheet, item, source, rowIv, colIv);
-        }).forEach(results::add);
+        //读取工作表中的引入工作表数据
+        sheetConfig.getRefSheetConfigs().stream().map((item) -> this.readOneSheet(workbook, sheet, item, source, rowIv, colIv)).forEach(results::add);
 
+        //读取结果中，有正常读取，则返回true
         return results.parallelStream().anyMatch(Boolean::booleanValue);
     }
 
-
+    //获得写入对象
     private Object getWriteObj(SheetConfig sheetConfig, Object source) {
-        if (sheetConfig.getDataType() == null) {
+        if (sheetConfig.getDataType() == null) {//数据类型为空时，返回当前对象，仅在根对象时执行
             return source;
         } else {
             try {
-                Object result = sheetConfig.getDataType().getConstructor().newInstance();
-                sheetConfig.setData(source, result);
+                Object result = sheetConfig.getDataType().getConstructor().newInstance();//构建对象
+                sheetConfig.setData(source, result);//将构建结果放入所属对象中
                 return result;
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
                 throw new ExportException("构建导出对象失败", e);
@@ -158,16 +177,16 @@ public class ExcelImporter {
     }
 
     /**
-     * 根据配置信息获取读取的工作簿对象
+     * 根据配置信息获取读取的工作表对象
      */
     private Sheet getReadSheet(Workbook workbook, Object source, SheetConfig sheetConfig, int loopIndex) {
         if (sheetConfig.getSheetNameFormatter() == null) {
-            return workbook.getSheet(sheetConfig.getName());
+            return workbook.getSheet(sheetConfig.getName());//无工作表名格式化对象时，返回表明
         } else {
             Sheet result;
-            for (int i = 0, length = workbook.getNumberOfSheets(); i < length; i++) {
+            for (int i = 0, length = workbook.getNumberOfSheets(); i < length; i++) {//有格式化对象表明时，执行格式化对象中的检查
                 result = workbook.getSheetAt(i);
-                if (sheetConfig.getSheetNameFormatter().checkSheet(source, sheetConfig, result.getSheetName(), loopIndex)) {
+                if (sheetConfig.getSheetNameFormatter().checkSheet(source, sheetConfig, result.getSheetName(), loopIndex)) {//匹配成功则返回
                     return result;
                 }
             }
@@ -175,19 +194,20 @@ public class ExcelImporter {
         return null;
     }
 
+    //读取单元格配置信息数据
     private boolean readCell(Sheet sheet, CellConfig cellConfig, Object source, int rowIv, int colIv) {
-        RepeatConfig repeatConfig = cellConfig.getRepeatConfig();
+        RepeatConfig repeatConfig = cellConfig.getRepeatConfig();//循环读取配置
         if (repeatConfig == null) {
-            Cell readCell = this.getReadCell(sheet, cellConfig, rowIv, colIv);
+            Cell readCell = this.getReadCell(sheet, cellConfig, rowIv, colIv);//获得读取单元格
             if (readCell == null) {
-                return false;
+                return false;//单元格未找到，读取失败
             }
 
-            Object data = this.formatCellData(readCell, cellConfig, rowIv, colIv);
-            if (data == null) {
+            Object data = this.formatCellData(readCell, cellConfig, rowIv, colIv);//获得数据
+            if (data == null) {//数据为null，读取失败
                 return false;
             } else {
-                cellConfig.setData(source, data);
+                cellConfig.setData(source, data);//设置数据
                 return true;
             }
         } else {
@@ -208,13 +228,15 @@ public class ExcelImporter {
                 if (data == null) {
                     break;
                 }
-                collectionData.add(data);
+                collectionData.add(data);//写入数据
 
+                //列位移
                 var nextIv = repeatConfig.getNextIv(currentIndex, source);
                 rowIv += nextIv[0];
                 colIv += nextIv[1];
                 currentIndex++;
             }
+            //循环 无数据写入，读取失败
             if (collectionData.isEmpty()) {
                 return false;
             } else {

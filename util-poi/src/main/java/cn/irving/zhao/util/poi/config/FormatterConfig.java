@@ -4,7 +4,6 @@ import cn.irving.zhao.util.poi.annonation.Formatter;
 import cn.irving.zhao.util.poi.formatter.CellDataFormatter;
 import cn.irving.zhao.util.poi.formatter.FormatterFactory;
 import lombok.Getter;
-import lombok.Setter;
 
 /**
  * 单元格格式化配置信息
@@ -36,7 +35,7 @@ public class FormatterConfig {
         this.cellDataFormatter = null;
     }
 
-    public FormatterConfig(CellDataFormatter cellDataFormatter) {
+    FormatterConfig(CellDataFormatter cellDataFormatter) {
         this.cellDataFormatter = cellDataFormatter;
         this.formatString = null;
     }

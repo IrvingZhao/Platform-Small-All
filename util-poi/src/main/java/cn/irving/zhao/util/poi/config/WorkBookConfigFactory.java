@@ -9,6 +9,8 @@ import org.apache.commons.collections4.map.ReferenceMap;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
@@ -22,9 +24,9 @@ public final class WorkBookConfigFactory {
     private WorkBookConfigFactory() {
     }
 
-    private ReferenceMap<String, WorkBookConfig> workBookCache = new ReferenceMap<>();
+    private ReferenceMap<String, WorkBookConfig> workBookCache = new ReferenceMap<>();//WorkBook配置缓存
 
-    private ReferenceMap<String, SheetConfig> sheetConfigCache = new ReferenceMap<>();
+    private ReferenceMap<String, CellSheetCache> sheetConfigCache = new ReferenceMap<>();
 
     private static final WorkBookConfigFactory me = new WorkBookConfigFactory();
 
@@ -38,9 +40,9 @@ public final class WorkBookConfigFactory {
         var type = workbook.getClass();
         var result = me.workBookCache.get(type.getName());//读取缓存;
         if (result == null) {//缓存未命中
-            result = WorkBookConfig.createWorkBookConfig(workbook.getSheetName(), workbook.getWorkbookType(), workbook.getDefaultSheetNameFormatter());
+            result = WorkBookConfig.createWorkBookConfig(workbook.getWorkbookType(), workbook.getSheetName(), workbook.getDefaultSheetNameFormatter());//创建配置
 
-            me.setWorkBookConfig(result, type);
+            me.setWorkBookConfig(result, type);//设置配置
 
             me.workBookCache.put(type.getName(), result);//写入缓存
 
@@ -60,7 +62,7 @@ public final class WorkBookConfigFactory {
             if (bookConfig == null) {
                 throw new ExportException(type.getName() + "未找到 " + WorkBook.class.getName() + " 注解");
             }
-            result = WorkBookConfig.createWorkBookConfig(bookConfig.defaultSheetName(), bookConfig.type(), factory.getFormatter(bookConfig.defaultSheetNameFormatter()));
+            result = WorkBookConfig.createWorkBookConfig(bookConfig.type(), bookConfig.defaultSheetName(), factory.getFormatter(bookConfig.defaultSheetNameFormatter()));
 
             me.setWorkBookConfig(result, type);
 
@@ -118,18 +120,26 @@ public final class WorkBookConfigFactory {
     }
 
     private void generateSheetCellConfig(SheetConfig sheetConfig, Class<?> fieldType) {
-        var tempType = fieldType;
-        while (tempType != Object.class) {
-            var fields = tempType.getDeclaredFields();//获得所有属性
-            for (var field : fields) {
-                if (field.isAnnotationPresent(Cell.class)) {
-                    sheetConfig.addCellConfig(getCellConfig(field));//添加一个单元格信息
-                } else if (field.isAnnotationPresent(Sheet.class)) {
-                    sheetConfig.addSheetConfig(getSheetConfig(field));//嵌入另外一个工作表
+        var cache = me.sheetConfigCache.get(fieldType.getName());
+        if (cache == null) {
+            cache = new CellSheetCache();
+            var tempType = fieldType;
+            while (tempType != Object.class) {
+                var fields = tempType.getDeclaredFields();//获得所有属性
+                for (var field : fields) {
+                    if (field.isAnnotationPresent(Cell.class)) {
+                        cache.cellConfigList.add(this.getCellConfig(field));//添加一个单元格信息
+                    } else if (field.isAnnotationPresent(Sheet.class)) {
+                        cache.sheetConfigLis.add(this.getSheetConfig(field));//嵌入另外一个工作表
+                    }
                 }
+                tempType = tempType.getSuperclass();
             }
-            tempType = tempType.getSuperclass();
+            System.out.println(fieldType.getName());
+            me.sheetConfigCache.put(fieldType.getName(), cache);
         }
+        sheetConfig.getRefSheetConfigs().addAll(cache.sheetConfigLis);
+        sheetConfig.getCellConfigs().addAll(cache.cellConfigList);
     }
 
     /**
@@ -152,7 +162,7 @@ public final class WorkBookConfigFactory {
         return (source) -> {
             try {
                 return field.get(source);
-            } catch (IllegalAccessException e) {
+            } catch (IllegalAccessException | IllegalArgumentException e) {
                 e.printStackTrace();
             }
             return null;
@@ -171,6 +181,11 @@ public final class WorkBookConfigFactory {
                 e.printStackTrace();
             }
         };
+    }
+
+    private static class CellSheetCache {
+        public List<CellConfig> cellConfigList = new ArrayList<>();
+        public List<SheetConfig> sheetConfigLis = new ArrayList<>();
     }
 
 
