@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
  */
 @Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface MergedRegion {
+public @interface MergedPosition {
 
     /**
      * 目标单元格行坐标

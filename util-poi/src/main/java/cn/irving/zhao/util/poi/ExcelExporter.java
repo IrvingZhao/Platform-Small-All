@@ -2,12 +2,11 @@ package cn.irving.zhao.util.poi;
 
 import cn.irving.zhao.util.poi.config.*;
 import cn.irving.zhao.util.poi.enums.CellDataType;
-import cn.irving.zhao.util.poi.enums.Direction;
 import cn.irving.zhao.util.poi.enums.SheetType;
-import cn.irving.zhao.util.poi.enums.WorkbookType;
 import cn.irving.zhao.util.poi.exception.ExportException;
 import cn.irving.zhao.util.poi.inter.IWorkbook;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.CellRangeAddress;
 
 import java.io.*;
 import java.util.*;
@@ -15,7 +14,7 @@ import java.util.*;
 /**
  * POI 工具包
  */
-public final class ExcelExporter extends ExcelOperator {
+public final class ExcelExporter {
 
     private ExcelExporter() {
 
@@ -40,13 +39,8 @@ public final class ExcelExporter extends ExcelOperator {
      */
     public static void export(IWorkbook data, String output, InputStream template) throws ExportException {
         try {
-            File file = new File(output);
-            if (!file.exists()) {
-                if (!file.createNewFile()) {
-                    throw new ExportException("文件：" + output + "创建失败");
-                }
-            }
-            FileOutputStream outputStream = new FileOutputStream(file);
+            var file = me.createOutputFile(output);
+            var outputStream = new FileOutputStream(file);
             export(data, outputStream, template);
         } catch (IOException e) {
             throw new ExportException("流异常", e);
@@ -62,13 +56,8 @@ public final class ExcelExporter extends ExcelOperator {
      */
     public static void export(IWorkbook data, String output, String template) throws ExportException {
         try {
-            File file = new File(output);
-            if (!file.exists()) {
-                if (!file.createNewFile()) {
-                    throw new ExportException("文件：" + output + "创建失败");
-                }
-            }
-            FileOutputStream outputStream = new FileOutputStream(file);
+            var file = me.createOutputFile(output);
+            var outputStream = new FileOutputStream(file);
             export(data, outputStream, me.getTemplateStreamByPath(template));
         } catch (IOException e) {
             throw new ExportException("流异常", e);
@@ -82,7 +71,7 @@ public final class ExcelExporter extends ExcelOperator {
     private InputStream getTemplateStreamByPath(String path) throws FileNotFoundException {
         InputStream templateStream = null;
         if (path != null && !"".equals(path)) {
-            File templateFile = new File(path);// 检查文件，如果物理磁盘中存在，使用物理磁盘中的文件，不存在，使用class获得resource
+            var templateFile = new File(path);// 检查文件，如果物理磁盘中存在，使用物理磁盘中的文件，不存在，使用class获得resource
             if (templateFile.exists()) {
                 templateStream = new FileInputStream(templateFile);
             } else {
@@ -90,6 +79,16 @@ public final class ExcelExporter extends ExcelOperator {
             }
         }
         return templateStream;
+    }
+
+    private File createOutputFile(String output) throws IOException {
+        var file = new File(output);
+        if (!file.exists()) {
+            if (!file.createNewFile()) {
+                throw new ExportException("文件：" + output + "创建失败");
+            }
+        }
+        return file;
     }
 
 
@@ -102,10 +101,13 @@ public final class ExcelExporter extends ExcelOperator {
      */
     public static void export(IWorkbook data, OutputStream output, InputStream template) throws ExportException {
         try {
-            WorkBookConfig workBookConfig = WorkBookConfigFactory.getWorkbookConfig(data.getClass());
-            Workbook workbook = export(data.getWorkbookType(), workBookConfig, data, template);
+            var workBookConfig = WorkBookConfigFactory.getWorkBookConfig(data);
+
+            var workbook = export(workBookConfig, data, template);
+
             workbook.setForceFormulaRecalculation(true);
             workbook.write(output);
+
             output.flush();
         } catch (IOException e) {
             throw new ExportException("流异常", e);
@@ -115,38 +117,17 @@ public final class ExcelExporter extends ExcelOperator {
     /**
      * 获取WorkBook方法
      *
-     * @param type           导出类型
      * @param workBookConfig 导出配置信息
      * @param data           被导出的数据
+     * @param template       模板数据流
      * @return 工作簿对象
      */
-    public static Workbook export(WorkbookType type, WorkBookConfig workBookConfig, Object data, InputStream template) {
-        Workbook result = type.getWorkbook(template);
+    public static Workbook export(WorkBookConfig workBookConfig, Object data, InputStream template) {
+        var type = workBookConfig.getWorkbookType();
+        var result = type.getWorkbook(template);
 
-        SheetConfig defaultSheetConfig = workBookConfig.getDefaultSheetConfig();
-        if (defaultSheetConfig != null) {//默认单元表导出
-            String sheetName;
-            //获取默认Sheet 的名字
-            if (defaultSheetConfig.getSheetNameFormatter() == null) {
-                sheetName = defaultSheetConfig.getName();
-            } else {
-                sheetName = defaultSheetConfig.getSheetNameFormatter().getSheetName(data, defaultSheetConfig.getName(), 0);
-            }
-            //如果没有名字，使用时间戳设置名字
-            if (sheetName == null || sheetName.equals("")) {
-                sheetName = String.valueOf(System.currentTimeMillis());
-            }
-            defaultSheetConfig.setName(sheetName);
-            try {
-                //写入默认sheet
-                me.writeSheet(result, null, defaultSheetConfig, data, 0, 0);
-            } catch (ExportException e) {
-                throw new RuntimeException(data.getClass() + "中的默认单元表导出失败", e);
-            }
-
-        }
         //获得引入sheet配置信息
-        List<SheetConfig> sheetConfigs = workBookConfig.getSheetConfigs();
+        var sheetConfigs = workBookConfig.getSheetConfigs();
         if (sheetConfigs != null) {
             sheetConfigs.forEach((itemSheetConfig) -> {
                 try {
@@ -176,31 +157,33 @@ public final class ExcelExporter extends ExcelOperator {
             //如果是内嵌工作簿，添加行、列修正量
             rowIv += sheetConfig.getBaseRow();
             colIv += sheetConfig.getBaseCol();
+        } else if (sheetConfig.getSheetType() == SheetType.OUTER) {
+            //设置 表格修正量
+            rowIv = sheetConfig.getBaseRow();
+            colIv = sheetConfig.getBaseCol();
         }
-        RepeatConfig repeatConfig = sheetConfig.getRepeatConfig();
+        var repeatConfig = sheetConfig.getRepeatConfig();
         if (repeatConfig == null) {
             //非循环写入工作簿
-            Object data = sheetConfig.getData(source);
+            var data = sheetConfig.getData(source);
             Sheet writeDataSheet = null;
             //根据工作簿配置创建具体写入工作簿对象
             if (sheetConfig.getSheetType() == SheetType.INNER) {
                 writeDataSheet = sheet;
             } else if (sheetConfig.getSheetType() == SheetType.OUTER) {
-                writeDataSheet = getWriteSheet(workbook, sheetConfig, data, 0);
+                writeDataSheet = this.getWriteSheet(workbook, sheetConfig, data, 0);
             }
             //将数据写入工作簿
-            writeSheet(workbook, writeDataSheet, sheetConfig.getSheetCellConfig(), data, rowIv, colIv);
+            this.writeSheetData(workbook, writeDataSheet, sheetConfig, data, rowIv, colIv);
         } else {
-            Direction dir = repeatConfig.getDirection();
-            int identity = repeatConfig.getIdentity();
-            int max = repeatConfig.getMax();
-            int currentIndex = 0;
-            Object data = sheetConfig.getData(source);
+            var max = repeatConfig.getMax();
+            var currentIndex = 0;
+            var data = sheetConfig.getData(source);
             Sheet writeDataSheet = null;
             //检查数据是否为一个集合类型
             if (data instanceof Iterable) {
                 //迭代循环次数
-                for (Object itemData : ((Iterable) data)) {
+                for (var itemData : ((Iterable) data)) {
                     if (max > 0 && currentIndex >= max) {//最大循环次数判断
                         break;
                     }
@@ -208,45 +191,26 @@ public final class ExcelExporter extends ExcelOperator {
                     if (sheetConfig.getSheetType() == SheetType.INNER) {
                         writeDataSheet = sheet;
                     } else if (sheetConfig.getSheetType() == SheetType.OUTER) {
-                        writeDataSheet = getWriteSheet(workbook, sheetConfig, itemData, currentIndex);
-                        rowIv = colIv = 0;//外联引入时，重置行、列修正量
+                        writeDataSheet = this.getWriteSheet(workbook, sheetConfig, itemData, currentIndex);
                     }
                     //写入数据
-                    writeSheet(workbook, writeDataSheet, sheetConfig.getSheetCellConfig(), itemData, rowIv, colIv);
-                    //维护修正量
-                    if (sheetConfig.getSheetType() == SheetType.INNER) {
-                        if (dir == Direction.HERIZONTAL) {
-                            colIv += identity;
-                        } else if (dir == Direction.VERTICALLY) {
-                            rowIv += identity;
-                        } else if (dir == Direction.BOTH) {
-                            rowIv += identity;
-                            colIv += identity;
-                        }
-                    }
+                    this.writeSheetData(workbook, writeDataSheet, sheetConfig, itemData, rowIv, colIv);
+
+                    var ivs = repeatConfig.getNextIv(currentIndex, source);
+                    rowIv += ivs[0];
+                    colIv += ivs[1];
+
                     currentIndex++;
                 }
             }
         }
     }
 
-    /**
-     * 写入工作簿数据
-     *
-     * @param workbook        工作表
-     * @param sheet           工作簿
-     * @param sheetCellConfig 工作簿单元格配置信息
-     * @param source          工作簿数据对象
-     * @param rowIv           行修正量
-     * @param colIv           列修正量
-     */
-    private void writeSheet(Workbook workbook, Sheet sheet, SheetCellConfig sheetCellConfig, Object source, int rowIv, int colIv) {
-        sheetCellConfig.getCellConfigs().forEach((cellConfig) -> {//写入单元格
-            writeCell(workbook, sheet, cellConfig, source, rowIv, colIv);
-        });
-        sheetCellConfig.getRefSheetConfigs().forEach((itemConfig) -> {//写入工作簿
-            writeSheet(workbook, sheet, itemConfig, source, rowIv, colIv);
-        });
+    private void writeSheetData(Workbook workbook, Sheet sheet, SheetConfig sheetConfig, Object data, int rowIv, int colIv) {
+
+        sheetConfig.getCellConfigs().forEach((item) -> this.writeCell(workbook, sheet, item, data, rowIv, colIv));
+
+        sheetConfig.getRefSheetConfigs().forEach((item) -> this.writeSheet(workbook, sheet, item, data, rowIv, colIv));
     }
 
     /**
@@ -257,39 +221,32 @@ public final class ExcelExporter extends ExcelOperator {
      * @param data       单元格数据所属对象
      */
     private void writeCell(Workbook workbook, Sheet sheet, CellConfig cellConfig, Object data, int rowIv, int colIv) throws ExportException {
-        RepeatConfig repeatConfig = cellConfig.getRepeatConfig();
-        Object cellData = cellConfig.getData(data);//获取单元格数据
+        var repeatConfig = cellConfig.getRepeatConfig();
+        var cellData = cellConfig.getData(data);//获取单元格数据
         if (cellData == null) {//数据为空时，跳出
             return;
         }
         if (repeatConfig == null) {//检查单元格是否为循环写入
             try {
-                writeCellData(workbook, sheet, cellConfig, cellData, rowIv, colIv);//单一数据写入
+                this.writeCellData(workbook, sheet, cellConfig, cellData, rowIv, colIv, data);//单一数据写入
             } catch (ExportException e) {
                 throw new ExportException("写入第" + cellConfig.getRowIndex() + "行，第" + cellConfig.getCellIndex() + "列数据失败", e);
             }
         } else {
-            int currentIndex = 0;
-            int max = repeatConfig.getMax();
-            int identity = repeatConfig.getIdentity();
-            Direction dir = repeatConfig.getDirection();
+            var currentIndex = 0;
+            var max = repeatConfig.getMax();
             if (cellData instanceof Iterable) {//检查循环写入的数据类型是否可迭代
                 try {
-                    for (Object dataItem : ((Iterable) cellData)) {//迭代数据
+                    for (var dataItem : ((Iterable) cellData)) {//迭代数据
                         if (max > 0 && currentIndex >= max) {//最大循环次数判断
                             break;
                         }
-                        writeCellData(workbook, sheet, cellConfig, dataItem, rowIv, colIv);//写入单元格数据
+                        this.writeCellData(workbook, sheet, cellConfig, dataItem, rowIv, colIv, data);//写入单元格数据
 
-                        //计算行、列权重
-                        if (dir == Direction.HERIZONTAL) {
-                            colIv += identity;
-                        } else if (dir == Direction.VERTICALLY) {
-                            rowIv += identity;
-                        } else if (dir == Direction.BOTH) {
-                            rowIv += identity;
-                            colIv += identity;
-                        }
+                        var ivs = repeatConfig.getNextIv(currentIndex, data);
+                        rowIv += ivs[0];
+                        colIv += ivs[1];
+
                         currentIndex++;
                     }
                 } catch (ExportException e) {
@@ -311,35 +268,37 @@ public final class ExcelExporter extends ExcelOperator {
      * @param rowIv      行坐标修正值
      * @param colIv      列坐标修正值
      */
-    private void writeCellData(Workbook workbook, Sheet sheet, CellConfig cellConfig, Object cellData, int rowIv, int colIv) throws ExportException {//写入cell 数据
-        MergedConfig mergedConfig = cellConfig.getMergedConfig();
+    private void writeCellData(Workbook workbook, Sheet sheet, CellConfig cellConfig, Object cellData, int rowIv, int colIv, Object cellDataSource) throws ExportException {//写入cell 数据
+        var mergedConfig = cellConfig.getMergedConfig();
         Cell cell;
         if (mergedConfig == null) {//检查是否需要合并单元格
             //根据行坐标、列坐标、行权重、列权重获取单元格
-            cell = getCell(getRow(sheet, cellConfig.getRowIndex() + rowIv), cellConfig.getCellIndex() + colIv);
+            cell = this.getCell(getRow(sheet, cellConfig.getRowIndex() + rowIv), cellConfig.getCellIndex() + colIv);
         } else {
             //根据合并单元格配置，行权重，列权重获取单元格
-            cell = getMergedCell(sheet,
-                    mergedConfig.getStartRowIndex() + rowIv,
-                    mergedConfig.getStartColIndex() + colIv,
-                    mergedConfig.getEndRowIndex() + rowIv,
-                    mergedConfig.getEndColIndex() + colIv);
+            var mergePosition = mergedConfig.getMergedPosition(cellDataSource);
+            cell = this.getMergedCell(sheet,
+                    mergePosition[0] + rowIv,
+                    mergePosition[1] + colIv,
+                    mergePosition[2] + rowIv,
+                    mergePosition[3] + colIv);
         }
-        CellDataType dataType = cellConfig.getDataType();//数据类型
-        FormatterConfig formatterConfig = cellConfig.getFormatterConfig();//数据格式化配置
+        var dataType = cellConfig.getDataType();//数据类型
+        var formatterConfig = cellConfig.getFormatterConfig();//数据格式化配置
         if (formatterConfig != null) {
-            String formatterPattern = formatterConfig.getFormatString();
+            var formatterPattern = formatterConfig.getFormatString();
             if (formatterPattern != null && !"".equals(formatterPattern)) {//设置excel中数据格式化的格式
-                getCellStyle(cell, workbook).setDataFormat(workbook.createDataFormat().getFormat(formatterPattern));
+                this.getCellStyle(cell, workbook)
+                        .setDataFormat(workbook.createDataFormat().getFormat(formatterPattern));
             }
             if (formatterConfig.getCellDataFormatter() != null) {//如果包含数据格式化方法，执行格式化
                 cellData = formatterConfig.getCellDataFormatter().format(cellData, cellConfig, rowIv, colIv);
             }
         }
         if (dataType == CellDataType.AUTO) {//根据数据类型，执行不同的数据写入逻辑
-            writeAutoTypeCell(cell, cellData);
+            this.writeAutoTypeCell(cell, cellData);
         } else {
-            writeCustomTypeCell(cell, dataType, cellData);
+            this.writeCustomTypeCell(cell, dataType, cellData);
         }
     }
 
@@ -413,6 +372,70 @@ public final class ExcelExporter extends ExcelOperator {
             sheetName = sheetConfig.getName();
         }
         return getSheet(workbook, sheetName);
+    }
+
+
+    /**
+     * 获取单元格样式，单元格样式找不到时，自动创建新样式，并添加至单元格中
+     *
+     * @param cell     单元对象
+     * @param workbook 工作簿对象
+     * @return 单元格样式对象
+     */
+    private CellStyle getCellStyle(Cell cell, Workbook workbook) {
+        if (cell.getCellStyle() == null) {
+            cell.setCellStyle(workbook.createCellStyle());
+        }
+        return cell.getCellStyle();
+    }
+
+
+    /**
+     * 获得合并单元格
+     *
+     * @param sheet    工作表对象
+     * @param startRow 合并开始行
+     * @param startCol 合并开始列
+     * @param endRow   合并结束行
+     * @param endCol   合并结束列
+     * @return 单元格对象
+     */
+    private Cell getMergedCell(Sheet sheet, int startRow, int startCol, int endRow, int endCol) {
+        sheet.addMergedRegion(new CellRangeAddress(startRow, endRow, startCol, endCol));
+        return getCell(getRow(sheet, startRow), startCol);
+    }
+
+    /**
+     * 获取工作簿中的工作表
+     *
+     * @param workbook  工作簿对象
+     * @param sheetName 工作表名称
+     * @return 工作表对象
+     */
+    private Sheet getSheet(Workbook workbook, String sheetName) {
+        return workbook.getSheet(sheetName) == null ? workbook.createSheet(sheetName) : workbook.getSheet(sheetName);
+    }
+
+    /**
+     * 获取工作表中的行
+     *
+     * @param sheet    工作表
+     * @param rowIndex 行坐标
+     * @return 行对象
+     */
+    private Row getRow(Sheet sheet, int rowIndex) {
+        return sheet.getRow(rowIndex) == null ? sheet.createRow(rowIndex) : sheet.getRow(rowIndex);
+    }
+
+    /**
+     * 获取单元格对象
+     *
+     * @param row       单元格所在行
+     * @param cellIndex 单元格纵坐标
+     * @return 单元格对象
+     */
+    private Cell getCell(Row row, int cellIndex) {
+        return row.getCell(cellIndex) == null ? row.createCell(cellIndex) : row.getCell(cellIndex);
     }
 
 

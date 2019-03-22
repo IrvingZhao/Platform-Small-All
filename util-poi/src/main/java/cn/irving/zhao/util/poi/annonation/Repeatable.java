@@ -1,6 +1,7 @@
 package cn.irving.zhao.util.poi.annonation;
 
-import cn.irving.zhao.util.poi.enums.Direction;
+import cn.irving.zhao.util.poi.formatter.RepeatCheck;
+import cn.irving.zhao.util.poi.formatter.RepeatIVFormatter;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -16,18 +17,18 @@ import java.util.Collection;
 public @interface Repeatable {
 
     /**
-     * 循环方向
+     * 循环每次行移动量
      *
-     * @return 循环方向
+     * @return 行移动量，默认0
      */
-    Direction direction() default Direction.VERTICALLY;
+    int rowIdentity() default 0;
 
     /**
-     * 每次递增数值
+     * 循环每次列移动量
      *
-     * @return 自增值
+     * @return 列移动量，默认0
      */
-    int identity() default 1;
+    int colIdentity() default 0;
 
     /**
      * 循环最大次数
@@ -38,6 +39,20 @@ public @interface Repeatable {
      * @return 最大循环次数
      */
     int max() default -1;
+
+    /**
+     * 重复向量格式化类
+     *
+     * @return 格式化类
+     */
+    Class<? extends RepeatIVFormatter> formatter() default RepeatIVFormatter.class;
+
+    /**
+     * 循环检查类
+     *
+     * @return 循环检查类
+     */
+    Class<? extends RepeatCheck> check() default RepeatCheck.class;
 
     /**
      * 集合具体实现类，读取时使用

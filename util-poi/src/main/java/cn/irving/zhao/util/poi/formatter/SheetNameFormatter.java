@@ -21,9 +21,10 @@ public interface SheetNameFormatter {
      * 检查sheet是否为可读取sheet，并可设置读取对象中的内容
      *
      * @param obj         读取对象
-     * @param sheetConfig 工作簿配置信息
-     * @param sheetName   工作簿名称
+     * @param sheetConfig 工作表配置信息
+     * @param sheetName   被检查的工作表名称
      * @param loopIndex   循环第几次
+     * @return 是否匹配
      */
     boolean checkSheet(Object obj, SheetConfig sheetConfig, String sheetName, int loopIndex);
 

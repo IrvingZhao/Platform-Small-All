@@ -6,7 +6,7 @@
 2. 创建 `cn.irving.zhao.util.poi.ExcelExporter` 实例，并调用 `export` 方法，传入 Workbook对象，输出流，模板文件等内容
 
 ```java
-WorkbookContainer workbookContainer = new WorkbookContainer();
+entity.WorkbookContainer workbookContainer = new entity.WorkbookContainer();
 ExcelExporter excelExporter = new ExcelExporter();
 excelExporter.export(workbookContainer, "D:\\basepath\\a.xlsx", "");
 ```
@@ -25,7 +25,7 @@ excelExporter.export(workbookContainer, "D:\\basepath\\a.xlsx", "");
 
 ##### 合并单元格
 
-> 在单个属性的基础上，添加`cn.irving.zhao.util.poi.annonation.MergedRegion` 注解，并配置`endRowIndex` 结束行坐标，`endColIndex` 结束列坐标，合并单元格的行列坐标为：开始行 - Cell.rowIndex，开始列 - Cell.cellIndex，结束行endRowIndex，结束列endColIndex。注：当`MergedRegion` 与 `Repeatable` 同时使用时，每次合并的坐标在基础坐标的基础上，增加`Repeatable.identity`。
+> 在单个属性的基础上，添加`cn.irving.zhao.util.poi.annonation.MergedPosition` 注解，并配置`endRowIndex` 结束行坐标，`endColIndex` 结束列坐标，合并单元格的行列坐标为：开始行 - Cell.rowIndex，开始列 - Cell.cellIndex，结束行endRowIndex，结束列endColIndex。注：当`MergedRegion` 与 `Repeatable` 同时使用时，每次合并的坐标在基础坐标的基础上，增加`Repeatable.identity`。
 
 ##### 工作簿引入
 
@@ -39,7 +39,7 @@ excelExporter.export(workbookContainer, "D:\\basepath\\a.xlsx", "");
 >
 > `baseRow` 与 `baseCol` 仅在`type` 为 `INNER` 时可用。`baseRow` 与 `baseCol` 为指定被引入的工作簿的0,0坐标所对应的当前工作簿的坐标，默认为0,0
 >
-> 注：`cn.irving.zhao.util.poi.annonation.Sheet` 与 `cn.irving.zhao.util.poi.annonation.Cell` 、`cn.irving.zhao.util.poi.annonation.MergedRegion` 不可同时使用
+> 注：`cn.irving.zhao.util.poi.annonation.Sheet` 与 `cn.irving.zhao.util.poi.annonation.Cell` 、`cn.irving.zhao.util.poi.annonation.MergedPosition` 不可同时使用
 
 ##### 单属性映射多工作簿
 
@@ -47,12 +47,12 @@ excelExporter.export(workbookContainer, "D:\\basepath\\a.xlsx", "");
 
 #### 配置样例
 
-##### WorkbookContainer
+##### entity.WorkbookContainer
 
 ```java
-public class WorkbookContainer implements IWorkbook {
+public class entity.WorkbookContainer implements IWorkbook {
     @Sheet(type = SheetType.OUTER, name = "workbook-outer-sheet1")
-    private Entity1 entity1;
+    private entity.Entity1 entity1;
 
     @Cell(rowIndex = 7, colIndex = 1)
     private String s1;
@@ -67,14 +67,14 @@ public class WorkbookContainer implements IWorkbook {
     private List<String> s3;
 
     @Sheet(type = SheetType.INNER)
-    private Entity2 entity2;
+    private entity.Entity2 entity2;
 }
 ```
 
-##### Entity1
+##### entity.Entity1
 
 ```java
-public class Entity1 {
+public class entity.Entity1 {
     @Cell(rowIndex = 1, colIndex = 1)
     private String s1;
 
@@ -89,22 +89,22 @@ public class Entity1 {
 
     @Sheet(type = SheetType.INNER, baseCol = 6, baseRow = 0)
     @Repeatable(direction = Direction.VERTICALLY, identity = 8)
-    private List<Entity2> entity2List;
+    private List<entity.Entity2> entity2List;
 
     @Sheet(type = SheetType.OUTER, name = "引入外部", nameFormatter = DemoNameFormatter.class)
     @Repeatable
-    private List<Entity2> entity2;
+    private List<entity.Entity2> entity2;
 
     @Sheet(type = SheetType.INNER, baseRow = 20, baseCol = 0)
     @Repeatable(direction = Direction.VERTICALLY, identity = 2)
-    private List<Entity3> entity3s;
+    private List<entity.Entity3> entity3s;
 }
 ```
 
-##### Entity2
+##### entity.Entity2
 
 ```java
-public class Entity2 {
+public class entity.Entity2 {
     @Cell(rowIndex = 1, colIndex = 1)
     private String s1;
 
@@ -119,10 +119,10 @@ public class Entity2 {
 }
 ```
 
-##### Entity3
+##### entity.Entity3
 
 ```java
-public class Entity3 {
+public class entity.Entity3 {
     @Cell(rowIndex = 1, colIndex = 1, dataType = CellDataType.NUMERIC)
     private int intA;
 
@@ -159,10 +159,10 @@ public class FormulaRepeatDataFormater implements CellDataFormatter {
 ##### 初始化数据及导出
 
 ```java
-WorkbookContainer workbookContainer = new WorkbookContainer();
-Entity1 e1_1 = new Entity1();
-Entity2 e2_1 = new Entity2();
-Entity2 e2_2 = new Entity2();
+entity.WorkbookContainer workbookContainer = new entity.WorkbookContainer();
+entity.Entity1 e1_1 = new entity.Entity1();
+entity.Entity2 e2_1 = new entity.Entity2();
+entity.Entity2 e2_2 = new entity.Entity2();
 
 workbookContainer.setS1("workbook-s1");
 workbookContainer.setS2(Arrays.asList("workbook-s2-1", "workbook-s2-2", "workbook-s2-3"));
@@ -177,21 +177,21 @@ e2_2.setS2(Arrays.asList("entity-2-2-s2-1", "entity-2-2-s2-2", "entity-2-2-s2-3"
 e2_2.setS3(Arrays.asList("entity-2-2-s3-1", "entity-2-2-s3-2", "entity-2-2-s3-3"));
 e1_1.setEntity2(Arrays.asList(e2_2, e2_2));
 
-Entity2 e1_1_e2_1 = new Entity2();
+entity.Entity2 e1_1_e2_1 = new entity.Entity2();
 e1_1_e2_1.setS1("e1_1_e2_1-s1");
 e1_1_e2_1.setS2(Arrays.asList("e1_1_e2_1-s2-1", "e1_1_e2_1-s2-2", "e1_1_e2_1-s2-3"));
 e1_1_e2_1.setS3(Arrays.asList("e1_1_e2_1-s3-1", "e1_1_e2_1-s3-2", "e1_1_e2_1-s3-3"));
 
-Entity2 e1_1_e2_2 = new Entity2();
+entity.Entity2 e1_1_e2_2 = new entity.Entity2();
 e1_1_e2_2.setS1("e1_1_e2_2-s1");
 e1_1_e2_2.setS2(Arrays.asList("e1_1_e2_2-s2-1", "e1_1_e2_2-s2-2", "e1_1_e2_2-s2-3"));
 e1_1_e2_2.setS3(Arrays.asList("e1_1_e2_2-s3-1", "e1_1_e2_2-s3-2", "e1_1_e2_2-s3-3"));
 
 e1_1.setEntity2List(Arrays.asList(e1_1_e2_1, e1_1_e2_2));
 
-Entity3 e1_1_e3_1 = new Entity3(1, 2, "测试1");
-Entity3 e1_1_e3_2 = new Entity3(2, 3, "测试2");
-Entity3 e1_1_e3_3 = new Entity3(3, 4, "测试3");
+entity.Entity3 e1_1_e3_1 = new entity.Entity3(1, 2, "测试1");
+entity.Entity3 e1_1_e3_2 = new entity.Entity3(2, 3, "测试2");
+entity.Entity3 e1_1_e3_3 = new entity.Entity3(3, 4, "测试3");
 
 e1_1.setEntity3s(Arrays.asList(e1_1_e3_1, e1_1_e3_2, e1_1_e3_3));
 workbookContainer.setEntity1(e1_1);

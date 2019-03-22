@@ -10,7 +10,6 @@ import lombok.Setter;
  * 单元格格式化配置信息
  */
 @Getter
-@Setter
 public class FormatterConfig {
 
     private static FormatterFactory<CellDataFormatter> factory = FormatterFactory.getFormatterFactory(CellDataFormatter.class);
@@ -27,28 +26,18 @@ public class FormatterConfig {
         }
     }
 
-    public FormatterConfig(String formatString, CellDataFormatter cellDataFormatter) {
+    FormatterConfig(String formatString, CellDataFormatter cellDataFormatter) {
         this.formatString = formatString;
         this.cellDataFormatter = cellDataFormatter;
     }
 
-    public FormatterConfig(String formatString) {
+    FormatterConfig(String formatString) {
         this.formatString = formatString;
         this.cellDataFormatter = null;
     }
 
     public FormatterConfig(CellDataFormatter cellDataFormatter) {
         this.cellDataFormatter = cellDataFormatter;
-        this.formatString = null;
-    }
-
-    public FormatterConfig(String formatString, Class<CellDataFormatter> formatterType) {
-        this.formatString = formatString;
-        this.cellDataFormatter = factory.getFormatter(formatterType);
-    }
-
-    public FormatterConfig(Class<? extends CellDataFormatter> formatterType) {
-        this.cellDataFormatter = factory.getFormatter(formatterType);
         this.formatString = null;
     }
 
