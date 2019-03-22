@@ -1,7 +1,9 @@
+package entity;
+
 import cn.irving.zhao.util.poi.annonation.Cell;
 import cn.irving.zhao.util.poi.annonation.Formatter;
 import cn.irving.zhao.util.poi.enums.CellDataType;
-import demo.FormulaRepeatDataFormater;
+import formatter.FormulaRepeatDataFormater;
 
 /**
  * Created by irving on 2017/8/7.

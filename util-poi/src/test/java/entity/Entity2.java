@@ -1,7 +1,8 @@
+package entity;
+
 import cn.irving.zhao.util.poi.annonation.Cell;
-import cn.irving.zhao.util.poi.annonation.MergedRegion;
+import cn.irving.zhao.util.poi.annonation.MergedPosition;
 import cn.irving.zhao.util.poi.annonation.Repeatable;
-import cn.irving.zhao.util.poi.enums.Direction;
 
 import java.util.List;
 
@@ -13,12 +14,14 @@ public class Entity2 {
     private String s1;
 
     @Cell(rowIndex = 2, colIndex = 2)
-    @Repeatable(direction = Direction.HERIZONTAL, identity = 1)
+//    @Repeatable(direction = Direction.HERIZONTAL, identity = 1)
+    @Repeatable(colIdentity = 1)
     private List<String> s2;
 
     @Cell(rowIndex = 3, colIndex = 3)
-    @Repeatable(direction = Direction.VERTICALLY, identity = 2, max = 2)
-    @MergedRegion(endRowIndex = 4, endColIndex = 4)
+//    @Repeatable(direction = Direction.VERTICALLY, identity = 2, max = 2)
+    @Repeatable(rowIdentity = 2, max = 2)
+    @MergedPosition(endRowIndex = 4, endColIndex = 4)
     private List<String> s3;
 
     public String getS1() {

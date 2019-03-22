@@ -1,4 +1,4 @@
-package demo;
+package formatter;
 
 import cn.irving.zhao.util.poi.config.CellConfig;
 import cn.irving.zhao.util.poi.formatter.CellDataFormatter;

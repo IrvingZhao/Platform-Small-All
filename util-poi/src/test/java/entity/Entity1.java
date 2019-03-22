@@ -1,10 +1,11 @@
+package entity;
+
 import cn.irving.zhao.util.poi.annonation.Cell;
-import cn.irving.zhao.util.poi.annonation.MergedRegion;
+import cn.irving.zhao.util.poi.annonation.MergedPosition;
 import cn.irving.zhao.util.poi.annonation.Repeatable;
 import cn.irving.zhao.util.poi.annonation.Sheet;
-import cn.irving.zhao.util.poi.enums.Direction;
 import cn.irving.zhao.util.poi.enums.SheetType;
-import demo.DemoNameFormatter;
+import formatter.DemoNameFormatter;
 
 import java.util.List;
 
@@ -17,16 +18,19 @@ public class Entity1 {
     private String s1;
 
     @Cell(rowIndex = 2, colIndex = 2)
-    @Repeatable(direction = Direction.HERIZONTAL, identity = 1)
+//    @Repeatable(direction = Direction.HERIZONTAL, identity = 1)
+    @Repeatable(colIdentity = 1)
     private List<String> s2;
 
     @Cell(rowIndex = 3, colIndex = 3)
-    @Repeatable(direction = Direction.VERTICALLY, identity = 2, max = 2)
-    @MergedRegion(endRowIndex = 4, endColIndex = 4)
+//    @Repeatable(direction = Direction.VERTICALLY, identity = 2, max = 2)
+    @Repeatable(rowIdentity = 2, max = 2)
+    @MergedPosition(endRowIndex = 4, endColIndex = 4)
     private List<String> s3;
 
     @Sheet(type = SheetType.INNER, baseCol = 6, baseRow = 0)
-    @Repeatable(direction = Direction.VERTICALLY, identity = 8, itemType = Entity2.class)
+//    @Repeatable(direction = Direction.VERTICALLY, identity = 8, itemType = Entity2.class)
+    @Repeatable(rowIdentity = 8, itemType = Entity2.class)
     private List<Entity2> entity2List;
 
     @Sheet(type = SheetType.OUTER, name = "引入外部", nameFormatter = DemoNameFormatter.class)
@@ -34,7 +38,8 @@ public class Entity1 {
     private List<Entity2> entity2;
 
     @Sheet(type = SheetType.INNER, baseRow = 20, baseCol = 0)
-    @Repeatable(direction = Direction.VERTICALLY, identity = 2, itemType = Entity3.class)
+//    @Repeatable(direction = Direction.VERTICALLY, identity = 2, itemType = Entity3.class)
+    @Repeatable(rowIdentity = 2, itemType = Entity3.class)
     private List<Entity3> entity3s;
 
 

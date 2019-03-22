@@ -1,4 +1,4 @@
-package demo;
+package formatter;
 
 import cn.irving.zhao.util.poi.config.SheetConfig;
 import cn.irving.zhao.util.poi.formatter.SheetNameFormatter;
