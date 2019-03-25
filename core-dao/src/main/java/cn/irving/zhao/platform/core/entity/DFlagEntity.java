@@ -12,6 +12,8 @@ import javax.persistence.Column;
 @Getter
 @Setter
 public class DFlagEntity {
+    public static final String COLUMN_D_FLAG = "dFlag";
+
     @Column(name = "d_flag")
     private TrueFalseEnum dFlag;
 }

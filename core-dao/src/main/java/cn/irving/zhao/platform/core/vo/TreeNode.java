@@ -21,7 +21,22 @@ public abstract class TreeNode<T, U extends TreeNode<T, U>> {
     private String parentId;
     private List<U> children;
 
+    /**
+     * 设置数据，当数据父节点对象未找到时，忽略父节点
+     *
+     * @param data 数据列表
+     */
     public void setData(List<T> data) {
+        this.setData(data, false);
+    }
+
+    /**
+     * 设置数据项
+     *
+     * @param data             数据列表
+     * @param nullParentToRoot 数据父节点未找到时，是否将其添加至根节点
+     */
+    public void setData(List<T> data, boolean nullParentToRoot) {
         Map<String, U> cache = new HashMap<>();
         TreeNode<T, U> root = this;
         data.stream().map(this::parse).forEach((item) -> cache.put(item.getId(), item));
@@ -32,11 +47,13 @@ public abstract class TreeNode<T, U extends TreeNode<T, U>> {
                 parent = root;
             } else {
                 parent = cache.get(value.getParentId());
-                if (parent == null) {
+                if (parent == null && nullParentToRoot) {
                     parent = root;
                 }
             }
-            parent.addChild(value);
+            if (parent != null) {
+                parent.addChild(value);
+            }
         });
     }
 
