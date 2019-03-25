@@ -1,7 +1,10 @@
 package cn.irving.zhao.util.base.serial;
 
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.ser.PropertyFilter;
@@ -296,5 +299,30 @@ public final class ObjectStringSerialUtil {
             logger.error("序列化失败", e);
             throw new RuntimeException(e);
         }
+    }
+
+    public void configure(MapperFeature f, boolean state) {
+        OBJECT_MAPPER.configure(f, state);
+        XML_MAPPER.configure(f,state);
+    }
+
+    public void configure(SerializationFeature f, boolean state) {
+        OBJECT_MAPPER.configure(f, state);
+        XML_MAPPER.configure(f,state);
+    }
+
+    public void configure(DeserializationFeature f, boolean state) {
+        OBJECT_MAPPER.configure(f, state);
+        XML_MAPPER.configure(f,state);
+    }
+
+    public void configure(JsonParser.Feature f, boolean state) {
+        OBJECT_MAPPER.configure(f, state);
+        XML_MAPPER.configure(f,state);
+    }
+
+    public void configure(JsonGenerator.Feature f, boolean state) {
+        OBJECT_MAPPER.configure(f, state);
+        XML_MAPPER.configure(f,state);
     }
 }
