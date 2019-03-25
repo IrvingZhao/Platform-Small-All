@@ -33,7 +33,7 @@
         <slf4j.version>1.7.25</slf4j.version>
         <junit.version>4.12</junit.version>
 
-        <poi.version>3.17</poi.version>
+        <poi.version>4.0.1</poi.version>
 
         <common.collection.version>4.1</common.collection.version>
         <common.pool.version>2.5.0</common.pool.version>
