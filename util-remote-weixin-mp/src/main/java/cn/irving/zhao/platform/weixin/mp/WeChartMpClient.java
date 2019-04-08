@@ -4,17 +4,30 @@ import cn.irving.zhao.platform.weixin.base.message.send.BaseSendInputMessage;
 import cn.irving.zhao.platform.weixin.base.message.send.BaseSendOutputMessage;
 import cn.irving.zhao.platform.weixin.base.message.send.MessageSender;
 import cn.irving.zhao.platform.weixin.mp.config.WeChartConfigManager;
+import cn.irving.zhao.platform.weixin.mp.config.WeChartMpConfig;
 import cn.irving.zhao.platform.weixin.mp.config.impl.DefaultWeChartConfigManager;
+import cn.irving.zhao.platform.weixin.mp.entity.RedirectUrlParam;
+import cn.irving.zhao.platform.weixin.mp.entity.UserInfo;
+import cn.irving.zhao.platform.weixin.mp.entity.UserTokenInfo;
+import cn.irving.zhao.platform.weixin.mp.entity.message.UserCodeToTokenInputMessage;
+import cn.irving.zhao.platform.weixin.mp.entity.message.UserCodeToTokenOutputMessage;
+import cn.irving.zhao.platform.weixin.mp.entity.message.UserInfoInputMessage;
+import cn.irving.zhao.platform.weixin.mp.entity.message.UserInfoOutputMessage;
 import cn.irving.zhao.platform.weixin.mp.message.send.BaseMpSendInputMessage;
 import cn.irving.zhao.platform.weixin.mp.message.send.BaseMpSendOutputMessage;
 import cn.irving.zhao.platform.weixin.mp.token.AccessTokenManager;
 import cn.irving.zhao.platform.weixin.mp.token.impl.DefaultAccessTokenManager;
+import lombok.Getter;
+import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.lang.reflect.InvocationTargetException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Properties;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * 微信公众号客户端
@@ -26,21 +39,21 @@ import java.util.concurrent.locks.ReentrantLock;
  * </ul>
  */
 public final class WeChartMpClient {
-    //TODO 添加  transient static 配置区域
+    private static final String AUTH_USER_REDIRECT_URL = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=%s&redirect_uri=%s&response_type=message&scope=%s&state=%s#wechat_redirect";
 
-    public static final String DEFAULT_NAME = "default";
-
-    private Logger logger = LoggerFactory.getLogger(WeChartMpClient.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(WeChartMpClient.class);
     /**
      * 微信配置文件
      */
     private String propertyPath = "/conf/wx.client.properties";
 
-    private static final MessageSender messageSender = new MessageSender();
+    private final MessageSender messageSender = new MessageSender();
 
-    private static final WeChartMpClient me = new WeChartMpClient();
-
+    @Setter
+    @Getter
     private AccessTokenManager tokenManager;
+    @Setter
+    @Getter
     private WeChartConfigManager configManager;
 
     private boolean init = false;
@@ -61,7 +74,7 @@ public final class WeChartMpClient {
                 loadProperties();
             }
             this.configManager.init();
-            this.tokenManager.init(this.configManager);
+            this.tokenManager.init(this.configManager, this::sendMessage);
         }
         init = true;
     }
@@ -82,19 +95,19 @@ public final class WeChartMpClient {
                     Class<?> configManagerClass;
                     if (configManagerClassName == null || configManagerClassName.equals("")) {
                         this.configManager = new DefaultWeChartConfigManager();
-                        logger.warn("配置文件中不包含wx.client.configManager项，configManager使用默认值");
+                        LOGGER.warn("配置文件中不包含wx.client.configManager项，configManager使用默认值");
                         break configManager;
                     }
                     configManagerClass = Class.forName(configManagerClassName);
                     if (!WeChartConfigManager.class.isAssignableFrom(configManagerClass)) {
                         this.configManager = new DefaultWeChartConfigManager();
-                        logger.warn(configManagerClassName + "不是一个有效的cn.irving.zhao.util.weChart.mp.config.WeChartConfigManager类型");
+                        LOGGER.warn(configManagerClassName + "不是一个有效的cn.irving.zhao.util.weChart.mp.config.WeChartConfigManager类型");
                         break configManager;
                     }
-                    this.configManager = (WeChartConfigManager) configManagerClass.newInstance();
+                    this.configManager = (WeChartConfigManager) configManagerClass.getDeclaredConstructor().newInstance();
                 }
-            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
-                logger.warn("tokenManager初始化失败，将使用默认值");
+            } catch (NoSuchMethodException | InvocationTargetException | ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+                LOGGER.warn("tokenManager初始化失败，将使用默认值");
                 this.configManager = new DefaultWeChartConfigManager();
             }
 
@@ -106,53 +119,120 @@ public final class WeChartMpClient {
                     Class<?> tokenManagerClass;
                     if (tokenManagerClassName == null || tokenManagerClassName.equals("")) {
                         this.tokenManager = new DefaultAccessTokenManager();
-                        logger.warn("配置文件中不包含wx.client.tokenManager，tokenManager使用默认值");
+                        LOGGER.warn("配置文件中不包含wx.client.tokenManager，tokenManager使用默认值");
                         break tokenManager;
                     }
                     tokenManagerClass = Class.forName(tokenManagerClassName);
                     if (!AccessTokenManager.class.isAssignableFrom(tokenManagerClass)) {
                         this.tokenManager = new DefaultAccessTokenManager();
-                        logger.warn(tokenManagerClassName + "不是一个有效的cn.irving.zhao.util.weChart.mp.config.AccessTokenManager类型");
+                        LOGGER.warn(tokenManagerClassName + "不是一个有效的cn.irving.zhao.util.weChart.mp.config.AccessTokenManager类型");
                         break tokenManager;
                     }
-                    this.tokenManager = (AccessTokenManager) tokenManagerClass.newInstance();
+                    this.tokenManager = (AccessTokenManager) tokenManagerClass.getDeclaredConstructor().newInstance();
                 }
-            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
-                logger.warn("tokenManager初始化失败，将使用默认值");
+            } catch (NoSuchMethodException | InvocationTargetException | ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+                LOGGER.warn("tokenManager初始化失败，将使用默认值");
                 this.tokenManager = new DefaultAccessTokenManager();
             }
 
         } catch (IOException e) {
             this.tokenManager = new DefaultAccessTokenManager();
             this.configManager = new DefaultWeChartConfigManager();
-            logger.warn("客户端配置文件加载异常，启用默认配置", e);
+            LOGGER.warn("客户端配置文件加载异常，启用默认配置", e);
         }
     }
 
-    public static <T extends BaseSendInputMessage> T sendMessage(BaseSendOutputMessage<T> outputMessage) {
-        return sendMessage(DEFAULT_NAME, outputMessage);
+    /**
+     * 发送消息，直接发送，用于无需设置token的消息
+     *
+     * @param outputMessage 待发送的消息
+     * @return 返回消息
+     */
+    public <T extends BaseSendInputMessage> T sendMessage(BaseSendOutputMessage<T> outputMessage) {
+        return this.messageSender.sendMessage(outputMessage);
     }
 
-    public static <T extends BaseSendInputMessage> T sendMessage(String configName, BaseSendOutputMessage<T> outputMessage) {
-        if (outputMessage instanceof BaseMpSendOutputMessage) {// 当消息需要使用 token时，初始化tokenManager  并设置 token
-            if (me.tokenManager == null || me.configManager == null) {
-                me.init();
-            }
-            String token = me.tokenManager.getToken(configName);
-            ((BaseMpSendOutputMessage) outputMessage).setAccessToken(token);
+    /**
+     * 发送消息，自动设置token，如果token失效，自动刷新token并重发
+     *
+     * @param configName    配置名
+     * @param outputMessage 待发送的消息
+     * @return 消息结果
+     */
+    public <T extends BaseMpSendInputMessage> T sendMessage(String configName, BaseMpSendOutputMessage<T> outputMessage) {
+        if (!this.init) {
+            this.init();
         }
-        T inputMessage = messageSender.sendMessage(outputMessage);
+        String token = this.tokenManager.getToken(configName);
+        outputMessage.setAccessToken(token);
+        T inputMessage = this.messageSender.sendMessage(outputMessage);
 
-        if (inputMessage instanceof BaseMpSendInputMessage) {//添加刷新机制
-            BaseMpSendInputMessage sendInputMessage = (BaseMpSendInputMessage) inputMessage;
-            if ("40001".equals(sendInputMessage.getErrCode()) || "40014".equals(sendInputMessage.getErrCode()) || "42001".equals(sendInputMessage.getErrCode())) {
-                me.logger.info("token need refresh by code [" + sendInputMessage.getErrCode() + "], reason [" + sendInputMessage.getErrMsg() + "]");
+        if (inputMessage != null) {//添加刷新机制
+            if ("40001".equals(inputMessage.getErrCode()) || "40014".equals(inputMessage.getErrCode()) || "42001".equals(inputMessage.getErrCode())) {
+                LOGGER.info("token need refresh by message [" + inputMessage.getErrCode() + "], reason [" + inputMessage.getErrMsg() + "]");
 
-                me.tokenManager.refreshToken(configName);
+                this.tokenManager.refreshToken(configName);
                 return sendMessage(configName, outputMessage);
             }
         }
         return inputMessage;
+    }
+
+    /**
+     * 获取授权访问地址
+     *
+     * @param configName       配置名
+     * @param redirectUrlParam 重定向及授权域配置
+     * @return 登录地址
+     */
+    public String getAuthUrl(String configName, RedirectUrlParam redirectUrlParam) {
+        WeChartMpConfig config = this.configManager.getConfig(configName);
+        try {
+            return String.format(AUTH_USER_REDIRECT_URL,
+                    config.getAppId(),
+                    URLEncoder.encode(redirectUrlParam.getRedirectUrl(), "UTF-8"),
+                    redirectUrlParam.getAuthScope().getCode(),
+                    redirectUrlParam.getState());
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * 根据授权码，获取用户Token信息
+     *
+     * @param configName 配置名
+     * @param authCode   授权码
+     * @return token信息
+     */
+    public UserTokenInfo getUserTokenByCode(String configName, String authCode) {
+        WeChartMpConfig config = this.configManager.getConfig(configName);
+        UserCodeToTokenOutputMessage outputMessage = new UserCodeToTokenOutputMessage(
+                config.getAppId(), config.getAppSecurity(), authCode
+        );
+        UserCodeToTokenInputMessage inputMessage = this.sendMessage(outputMessage);
+
+        return new UserTokenInfo(
+                inputMessage.getAccessToken(),
+                inputMessage.getExpiresIn(),
+                inputMessage.getRefreshToken(),
+                inputMessage.getOpenId(),
+                inputMessage.getScope()
+        );
+    }
+
+    /**
+     * 根据用户token和openId获取用户信息
+     *
+     * @param token  用户token
+     * @param openId 用户openId
+     * @return 用户信息
+     */
+    public UserInfo getUserInfoByTokenAndOpenId(String token, String openId) {
+        UserInfoOutputMessage outputMessage = new UserInfoOutputMessage(token, openId);
+        UserInfoInputMessage infoInputMessage = this.sendMessage(outputMessage);
+        return infoInputMessage.toUserInfo();
     }
 
     public String getPropertyPath() {
@@ -162,4 +242,5 @@ public final class WeChartMpClient {
     public void setPropertyPath(String propertyPath) {
         this.propertyPath = propertyPath;
     }
+
 }

@@ -16,11 +16,12 @@ import java.util.Objects;
 import java.util.Timer;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Function;
 
 /**
  * 默认token管理器
  */
-public class DefaultAccessTokenManager implements AccessTokenManager {
+public final class DefaultAccessTokenManager implements AccessTokenManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AccessTokenManager.class);
 
@@ -28,22 +29,26 @@ public class DefaultAccessTokenManager implements AccessTokenManager {
 
     private static final Timer TOKEN_REFRESH_TIMER = new Timer();
 
-    Map<String, ReentrantLock> lockMap = new HashMap<>();
+    private Map<String, ReentrantLock> lockMap = new HashMap<>();
 
     private WeChartConfigManager configManager;
+
+    private Function<AccessTokenOutputMessage, AccessTokenInputMessage> tokenLoader;
 
     /**
      * 初始化数据
      */
     @Override
-    public void init(WeChartConfigManager configManager) {
+    public void init(WeChartConfigManager configManager, Function<AccessTokenOutputMessage, AccessTokenInputMessage> tokenLoader) {
         this.configManager = configManager;
+        this.tokenLoader = tokenLoader;
+
         Map<String, WeChartMpConfig> configs = configManager.getConfigs();
         configs.entrySet().parallelStream().forEach((item) -> {
             lockMap.put(item.getKey(), new ReentrantLock());
             WeChartMpConfig itemConfig = item.getValue();
             AccessTokenOutputMessage tokenOutputMessage = new AccessTokenOutputMessage(itemConfig.getAppId(), itemConfig.getAppSecurity());
-            AccessTokenInputMessage tokenInputMessage = WeChartMpClient.sendMessage(tokenOutputMessage);
+            AccessTokenInputMessage tokenInputMessage = tokenLoader.apply(tokenOutputMessage);
             String errorCode = tokenInputMessage.getErrCode();
             if (errorCode == null || errorCode.equals("0")) {
                 tokenCache.put(item.getKey(), new AccessTokenInfo(tokenInputMessage.getAccessToken()));
@@ -109,9 +114,9 @@ public class DefaultAccessTokenManager implements AccessTokenManager {
 
     private String getToken(WeChartMpConfig mpConfig) {
         AccessTokenOutputMessage tokenOutputMessage = new AccessTokenOutputMessage(mpConfig.getAppId(), mpConfig.getAppSecurity());
-        AccessTokenInputMessage tokenInputMessage = WeChartMpClient.sendMessage(tokenOutputMessage);
+        AccessTokenInputMessage tokenInputMessage = this.tokenLoader.apply(tokenOutputMessage);
         if (tokenInputMessage.getErrCode() != null && !"".equals(tokenInputMessage.getErrCode())) {
-            LOGGER.error("GET TOKEN FAIL：error code is [" + tokenInputMessage.getErrCode() + "]，reason is [" + tokenInputMessage.getErrMsg() + "]");
+            LOGGER.error("GET TOKEN FAIL：error message is [" + tokenInputMessage.getErrCode() + "]，reason is [" + tokenInputMessage.getErrMsg() + "]");
         }
         return tokenInputMessage.getAccessToken();
     }
