@@ -9,7 +9,5 @@ import java.util.List;
 @Getter
 @Setter
 public class ListMaterialNewsInputMessage extends ListMaterialInputMessage {
-
     private List<NewsMaterial> item;
-
 }

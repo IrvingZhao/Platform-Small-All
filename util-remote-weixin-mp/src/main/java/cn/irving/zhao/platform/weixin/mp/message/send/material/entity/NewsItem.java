@@ -5,6 +5,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * 单个图文素材
+ */
 @Setter
 @Getter
 public class NewsItem {

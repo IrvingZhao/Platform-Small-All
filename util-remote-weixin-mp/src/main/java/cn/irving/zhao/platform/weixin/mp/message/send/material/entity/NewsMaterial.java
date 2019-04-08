@@ -7,6 +7,9 @@ import lombok.Setter;
 import java.util.Date;
 import java.util.List;
 
+/**
+ *
+ * */
 @Getter
 @Setter
 public class NewsMaterial {
@@ -14,7 +17,7 @@ public class NewsMaterial {
     @JsonProperty("media_id")
     private String mediaId;
 
-    private List<NewsItem> content;//TODO  content 为对象
+    private NewsListContent content;
 
     @JsonProperty("update_time")
     private Date updateTime;

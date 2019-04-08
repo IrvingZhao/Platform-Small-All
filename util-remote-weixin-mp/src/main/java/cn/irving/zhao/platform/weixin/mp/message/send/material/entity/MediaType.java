@@ -2,8 +2,11 @@ package cn.irving.zhao.platform.weixin.mp.message.send.material.entity;
 
 import cn.irving.zhao.util.base.serial.custom.CustomEnumValue;
 
+/**
+ * 素材类型
+ */
 public enum MediaType implements CustomEnumValue<MediaType, String> {
-    IMAGE, VOICE, VIDEO, THUMB,NEWS;
+    IMAGE, VOICE, VIDEO, THUMB, NEWS;
 
     MediaType() {
         this.code = this.name().toLowerCase();
