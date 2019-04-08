@@ -1,18 +1,16 @@
 package cn.irving.zhao.platform.weixin.mp.token.impl;
 
 
-import cn.irving.zhao.platform.weixin.mp.WeChartMpClient;
 import cn.irving.zhao.platform.weixin.mp.config.WeChartConfigManager;
 import cn.irving.zhao.platform.weixin.mp.config.WeChartMpConfig;
-import cn.irving.zhao.platform.weixin.mp.message.send.token.AccessTokenInputMessage;
-import cn.irving.zhao.platform.weixin.mp.message.send.token.AccessTokenOutputMessage;
+import cn.irving.zhao.platform.weixin.mp.send.message.token.AccessTokenInputMessage;
+import cn.irving.zhao.platform.weixin.mp.send.message.token.AccessTokenOutputMessage;
 import cn.irving.zhao.platform.weixin.mp.token.AccessTokenManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Timer;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;

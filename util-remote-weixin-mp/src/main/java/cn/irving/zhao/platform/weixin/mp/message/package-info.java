@@ -1,1 +1,0 @@
-package cn.irving.zhao.platform.weixin.mp.message;

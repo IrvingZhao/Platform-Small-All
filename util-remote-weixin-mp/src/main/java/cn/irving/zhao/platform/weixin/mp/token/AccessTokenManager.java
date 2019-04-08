@@ -2,8 +2,8 @@ package cn.irving.zhao.platform.weixin.mp.token;
 
 
 import cn.irving.zhao.platform.weixin.mp.config.WeChartConfigManager;
-import cn.irving.zhao.platform.weixin.mp.message.send.token.AccessTokenInputMessage;
-import cn.irving.zhao.platform.weixin.mp.message.send.token.AccessTokenOutputMessage;
+import cn.irving.zhao.platform.weixin.mp.send.message.token.AccessTokenInputMessage;
+import cn.irving.zhao.platform.weixin.mp.send.message.token.AccessTokenOutputMessage;
 
 import java.util.function.Function;
 

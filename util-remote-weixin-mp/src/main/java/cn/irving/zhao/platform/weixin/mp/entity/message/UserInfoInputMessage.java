@@ -1,7 +1,7 @@
 package cn.irving.zhao.platform.weixin.mp.entity.message;
 
 import cn.irving.zhao.platform.weixin.mp.entity.UserInfo;
-import cn.irving.zhao.platform.weixin.mp.message.send.BaseMpSendInputMessage;
+import cn.irving.zhao.platform.weixin.mp.send.message.BaseMpSendInputMessage;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;

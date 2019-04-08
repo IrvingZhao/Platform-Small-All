@@ -4,24 +4,20 @@ import cn.irving.zhao.util.base.serial.custom.CustomEnumValue;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-@Getter
 @AllArgsConstructor
-public enum ReceiverMessageType implements CustomEnumValue<ReceiverMessageType, String> {
+@Getter
+public enum SendMessageType implements CustomEnumValue<SendMessageType, String> {
     TEXT("text"),
     IMAGE("image"),
     VOICE("voice"),
     VIDEO("video"),
-    SHORT_VIDEO("shortvideo"),
-    LOCATION("location"),
-    LINK("link"),
-    EVENT("EVENT"),
+    MUSIC("music"),
+    NEWS("news"),
     ;
-
     private String code;
 
     @Override
-    public ReceiverMessageType[] getValues() {
-        return ReceiverMessageType.values();
+    public SendMessageType[] getValues() {
+        return SendMessageType.values();
     }
-
 }
