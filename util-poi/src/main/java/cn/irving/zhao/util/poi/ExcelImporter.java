@@ -43,8 +43,8 @@ public class ExcelImporter {
      */
     public static <T> T readExcel(Class<T> type, Workbook workbook) {
         try {
-            var result = type.getConstructor().newInstance();//创建返回结果
-            var config = WorkBookConfigFactory.getWorkBookConfig(result);//获取工作簿配置信息
+            T result = type.getConstructor().newInstance();//创建返回结果
+            WorkBookConfig config = WorkBookConfigFactory.getWorkBookConfig(result);//获取工作簿配置信息
 
             config.getSheetConfigs().forEach((item) -> {
                 me.readOneSheet(workbook, null, item, result, 0, 0);//依次读取工作簿中的工作表
@@ -65,7 +65,7 @@ public class ExcelImporter {
             rowIv = sheetConfig.getBaseRow();
             colIv = sheetConfig.getBaseCol();
         }
-        var repeatConfig = sheetConfig.getRepeatConfig();//循环读取配置
+        RepeatConfig repeatConfig = sheetConfig.getRepeatConfig();//循环读取配置
         if (repeatConfig == null) {
 
             Sheet readSheet;
@@ -79,18 +79,18 @@ public class ExcelImporter {
                 return false;
             }
 
-            var readObject = this.getWriteObj(sheetConfig, source);//获得工作表数据写入对象
+            Object readObject = this.getWriteObj(sheetConfig, source);//获得工作表数据写入对象
 
             this.readSheetData(workbook, readSheet, sheetConfig, readObject, rowIv, colIv);//读取配置中的信息
 
         } else {
-            var max = repeatConfig.getMax();
-            var currentIndex = 0;
-            var collectionData = this.getCollectionInstance(repeatConfig.getCollectionType(), sheetConfig.getDataType());//构建集合类
+            int max = repeatConfig.getMax();
+            int currentIndex = 0;
+            Collection<Object> collectionData = this.getCollectionInstance(repeatConfig.getCollectionType(), sheetConfig.getDataType());//构建集合类
 
             sheetConfig.setData(source, collectionData);//设置对象
 
-            var itemDataType = repeatConfig.getItemType();//单个元素类型
+            Class<?> itemDataType = repeatConfig.getItemType();//单个元素类型
 
             while (true) {
                 if (max > 0 && currentIndex >= max) {
@@ -118,7 +118,7 @@ public class ExcelImporter {
                 }
 
                 //读取单个对象数据
-                var readSheetResult = this.readSheetData(workbook, dataSheet, sheetConfig, itemData, rowIv, colIv);
+                boolean readSheetResult = this.readSheetData(workbook, dataSheet, sheetConfig, itemData, rowIv, colIv);
 
                 if (!readSheetResult) {//读取失败时，跳出
                     break;
@@ -211,10 +211,10 @@ public class ExcelImporter {
                 return true;
             }
         } else {
-            var collectionType = repeatConfig.getCollectionType();
-            var collectionData = getCollectionInstance(collectionType, cellConfig.getType());
-            var currentIndex = 0;
-            var max = repeatConfig.getMax();
+            Class<? extends Collection> collectionType = repeatConfig.getCollectionType();
+            Collection<Object> collectionData = getCollectionInstance(collectionType, cellConfig.getType());
+            int currentIndex = 0;
+            int max = repeatConfig.getMax();
             while (true) {
                 if (max > 0 && currentIndex >= max) {//最大循环次数判断
                     break;
@@ -231,7 +231,7 @@ public class ExcelImporter {
                 collectionData.add(data);//写入数据
 
                 //列位移
-                var nextIv = repeatConfig.getNextIv(currentIndex, source);
+                int[] nextIv = repeatConfig.getNextIv(currentIndex, source);
                 rowIv += nextIv[0];
                 colIv += nextIv[1];
                 currentIndex++;
@@ -248,7 +248,7 @@ public class ExcelImporter {
 
     private Cell getReadCell(Sheet sheet, CellConfig cellConfig, int rowIv, int colIv) {
         //获得读取单元格
-        var readRow = sheet.getRow(cellConfig.getRowIndex() + rowIv);
+        Row readRow = sheet.getRow(cellConfig.getRowIndex() + rowIv);
         if (readRow == null) {
             return null;
         }
@@ -328,7 +328,7 @@ public class ExcelImporter {
      * @param collectionType 注解中的配置类型
      * @param dataType       //属性对应的配置类型
      */
-    private Collection getCollectionInstance(Class<? extends Collection> collectionType, Class<?> dataType) {
+    private Collection<Object> getCollectionInstance(Class<? extends Collection> collectionType, Class<?> dataType) {
         try {
             if (collectionType != Collection.class) {//注解中包含配置，直接使用注解中配置的类型
                 return collectionType.getConstructor().newInstance();

@@ -8,7 +8,7 @@ public class RepeatIvFormatter implements RepeatIVFormatter {
     @Override
     public int[] getRowColIv(int loop, Object source) {
         WorkbookContainer work = (WorkbookContainer) source;
-        var length = work.getEntity4List().get(loop).getEntity5().size();
+        int length = work.getEntity4List().get(loop).getEntity5().size();
         return new int[]{length, 0};
     }
 

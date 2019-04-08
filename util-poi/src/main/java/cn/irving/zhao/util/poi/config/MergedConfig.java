@@ -56,7 +56,7 @@ public class MergedConfig {
         if (this.formatter == null) {
             return new int[]{startRowIndex, startColIndex, endRowIndex, endColIndex};
         } else {
-            var endPosition = this.formatter.endIndex(source);
+            int[] endPosition = this.formatter.endIndex(source);
             return new int[]{startRowIndex, startColIndex, endPosition[0], endPosition[1]};
         }
     }

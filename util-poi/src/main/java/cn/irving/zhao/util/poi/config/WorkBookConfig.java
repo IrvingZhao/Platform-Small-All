@@ -35,7 +35,7 @@ public class WorkBookConfig {
      * @param defaultSheetNameFormatter 工作簿默认工作表名称格式化对象
      */
     public static WorkBookConfig createWorkBookConfig(WorkbookType workbookType, String defaultSheetName, SheetNameFormatter defaultSheetNameFormatter) {
-        var result = new WorkBookConfig();
+        WorkBookConfig result = new WorkBookConfig();
         result.defaultSheetName = defaultSheetName;
         result.workbookType = workbookType;
         result.defaultSheetNameFormatter = defaultSheetNameFormatter;

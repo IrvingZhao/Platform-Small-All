@@ -52,7 +52,7 @@ public class Write {
 
         workbookContainer.setEntity2s(Arrays.asList(e1_1_e2_1, e1_1_e2_2));
 
-        workbookContainer.setEntity3s(List.of(e1_1_e3_1, e1_1_e3_2, e1_1_e3_3));
+        workbookContainer.setEntity3s(Arrays.asList(e1_1_e3_1, e1_1_e3_2, e1_1_e3_3));
 
         Entity4 entity4 = new Entity4();
 
@@ -65,7 +65,7 @@ public class Write {
 
         workbookContainer.setEntity4(entity4);
 
-        workbookContainer.setEntity4List(List.of(entity4, entity4, entity4));
+        workbookContainer.setEntity4List(Arrays.asList(entity4, entity4, entity4));
 
 //        WorkBookConfigFactory.getWorkBookConfig(workbookContainer);
 

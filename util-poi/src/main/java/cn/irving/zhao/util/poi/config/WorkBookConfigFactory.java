@@ -37,8 +37,8 @@ public final class WorkBookConfigFactory {
      * @return 工作簿配置
      */
     public static WorkBookConfig getWorkBookConfig(IWorkbook workbook) {
-        var type = workbook.getClass();
-        var result = me.workBookCache.get(type.getName());//读取缓存;
+        Class<?> type = workbook.getClass();
+        WorkBookConfig result = me.workBookCache.get(type.getName());//读取缓存;
         if (result == null) {//缓存未命中
             result = WorkBookConfig.createWorkBookConfig(workbook.getWorkbookType(), workbook.getSheetName(), workbook.getDefaultSheetNameFormatter());//创建配置
 
@@ -55,8 +55,8 @@ public final class WorkBookConfigFactory {
         if (workBook instanceof IWorkbook) {
             return getWorkBookConfig((IWorkbook) workBook);
         }
-        var type = workBook.getClass();
-        var result = me.workBookCache.get(type.getName());
+        Class<?> type = workBook.getClass();
+        WorkBookConfig result = me.workBookCache.get(type.getName());
         if (result == null) {
             WorkBook bookConfig = type.getAnnotation(WorkBook.class);
             if (bookConfig == null) {
@@ -73,15 +73,15 @@ public final class WorkBookConfigFactory {
     }
 
     private void setWorkBookConfig(WorkBookConfig workBookConfig, Class<?> workbookType) {
-        var tempType = workbookType;
+        Class<?> tempType = workbookType;
         while (tempType != Object.class) {
-            var fields = tempType.getDeclaredFields();//获得属性
-            for (var field : fields) {
+            Field[] fields = tempType.getDeclaredFields();//获得属性
+            for (Field field : fields) {
                 if (field.isAnnotationPresent(Sheet.class)) {//检查是不是一个工作表配置
-                    var sheetConfig = me.getSheetConfig(field);//获取工作表配置
+                    SheetConfig sheetConfig = me.getSheetConfig(field);//获取工作表配置
                     workBookConfig.addSheetConfig(sheetConfig);//添加工作表配置进工作簿
                 } else if (field.isAnnotationPresent(Cell.class)) {
-                    var cellConfig = me.getCellConfig(field);//单元格配置
+                    CellConfig cellConfig = me.getCellConfig(field);//单元格配置
                     workBookConfig.addCellConfig(cellConfig);
                 }
             }
@@ -96,10 +96,10 @@ public final class WorkBookConfigFactory {
      * @return 工作表配置信息
      */
     private SheetConfig getSheetConfig(Field field) {
-        var sheet = field.getAnnotation(Sheet.class);//工作表注解
-        var repeatable = field.getAnnotation(Repeatable.class);//是否重复
+        Sheet sheet = field.getAnnotation(Sheet.class);//工作表注解
+        Repeatable repeatable = field.getAnnotation(Repeatable.class);//是否重复
 
-        var sheetConfig = SheetConfig.createSheetConfig(sheet, this.getDataGetter(field), this.getDataSetter(field), field.getType());//构建单元表
+        SheetConfig sheetConfig = SheetConfig.createSheetConfig(sheet, this.getDataGetter(field), this.getDataSetter(field), field.getType());//构建单元表
         Class<?> fieldType;
         if (repeatable == null) {
             fieldType = field.getType();
@@ -120,13 +120,13 @@ public final class WorkBookConfigFactory {
     }
 
     private void generateSheetCellConfig(SheetConfig sheetConfig, Class<?> fieldType) {
-        var cache = me.sheetConfigCache.get(fieldType.getName());
+        CellSheetCache cache = me.sheetConfigCache.get(fieldType.getName());
         if (cache == null) {
             cache = new CellSheetCache();
-            var tempType = fieldType;
+            Class<?> tempType = fieldType;
             while (tempType != Object.class) {
-                var fields = tempType.getDeclaredFields();//获得所有属性
-                for (var field : fields) {
+                Field[] fields = tempType.getDeclaredFields();//获得所有属性
+                for (Field field : fields) {
                     if (field.isAnnotationPresent(Cell.class)) {
                         cache.cellConfigList.add(this.getCellConfig(field));//添加一个单元格信息
                     } else if (field.isAnnotationPresent(Sheet.class)) {
@@ -149,11 +149,11 @@ public final class WorkBookConfigFactory {
      * @return 属性对应的单元格配置
      */
     private CellConfig getCellConfig(Field field) {
-        var cell = field.getAnnotation(Cell.class);//表格坐标
-        var repeatable = field.getAnnotation(Repeatable.class);//是否循环
-        var mergedPosition = field.getAnnotation(MergedPosition.class);//是否合并单元格
-        var mergedFormat = field.getAnnotation(MergedFormat.class);//合并单元格格式化注解
-        var formatter = field.getAnnotation(Formatter.class);//单元格内容格式化注解
+        Cell cell = field.getAnnotation(Cell.class);//表格坐标
+        Repeatable repeatable = field.getAnnotation(Repeatable.class);//是否循环
+        MergedPosition mergedPosition = field.getAnnotation(MergedPosition.class);//是否合并单元格
+        MergedFormat mergedFormat = field.getAnnotation(MergedFormat.class);//合并单元格格式化注解
+        Formatter formatter = field.getAnnotation(Formatter.class);//单元格内容格式化注解
         return new CellConfig(cell, repeatable, mergedFormat, mergedPosition, formatter, this.getDataGetter(field), this.getDataSetter(field), field.getType());
     }
 
@@ -184,8 +184,8 @@ public final class WorkBookConfigFactory {
     }
 
     private static class CellSheetCache {
-        public List<CellConfig> cellConfigList = new ArrayList<>();
-        public List<SheetConfig> sheetConfigLis = new ArrayList<>();
+        List<CellConfig> cellConfigList = new ArrayList<>();
+        List<SheetConfig> sheetConfigLis = new ArrayList<>();
     }
 
 

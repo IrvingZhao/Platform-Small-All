@@ -29,7 +29,7 @@ public class SheetConfig {
     }
 
     static SheetConfig createSheetConfig(Sheet sheet, Function<Object, Object> dataGetter, BiConsumer<Object, Object> dataSetter, Class<?> dataType) {
-        var result = new SheetConfig();
+        SheetConfig result = new SheetConfig();
         result.sheetType = sheet.type();
 
         result.dataGetter = dataGetter;
@@ -53,7 +53,7 @@ public class SheetConfig {
     }
 
     static SheetConfig createOuterSheet(String name, SheetNameFormatter sheetNameFormatter, Function<Object, Object> dataGetter) {
-        var result = new SheetConfig();
+        SheetConfig result = new SheetConfig();
 
         result.sheetType = SheetType.OUTER;
         result.name = name;

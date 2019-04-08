@@ -3,6 +3,7 @@ package cn.irving.zhao.util.poi;
 import cn.irving.zhao.util.poi.config.*;
 import cn.irving.zhao.util.poi.enums.CellDataType;
 import cn.irving.zhao.util.poi.enums.SheetType;
+import cn.irving.zhao.util.poi.enums.WorkbookType;
 import cn.irving.zhao.util.poi.exception.ExportException;
 import cn.irving.zhao.util.poi.inter.IWorkbook;
 import org.apache.poi.ss.usermodel.*;
@@ -39,8 +40,8 @@ public final class ExcelExporter {
      */
     public static void export(IWorkbook data, String output, InputStream template) throws ExportException {
         try {
-            var file = me.createOutputFile(output);
-            var outputStream = new FileOutputStream(file);
+            File file = me.createOutputFile(output);
+            FileOutputStream outputStream = new FileOutputStream(file);
             export(data, outputStream, template);
         } catch (IOException e) {
             throw new ExportException("流异常", e);
@@ -56,8 +57,8 @@ public final class ExcelExporter {
      */
     public static void export(IWorkbook data, String output, String template) throws ExportException {
         try {
-            var file = me.createOutputFile(output);
-            var outputStream = new FileOutputStream(file);
+            File file = me.createOutputFile(output);
+            FileOutputStream outputStream = new FileOutputStream(file);
             export(data, outputStream, me.getTemplateStreamByPath(template));
         } catch (IOException e) {
             throw new ExportException("流异常", e);
@@ -71,7 +72,7 @@ public final class ExcelExporter {
     private InputStream getTemplateStreamByPath(String path) throws FileNotFoundException {
         InputStream templateStream = null;
         if (path != null && !"".equals(path)) {
-            var templateFile = new File(path);// 检查文件，如果物理磁盘中存在，使用物理磁盘中的文件，不存在，使用class获得resource
+            File templateFile = new File(path);// 检查文件，如果物理磁盘中存在，使用物理磁盘中的文件，不存在，使用class获得resource
             if (templateFile.exists()) {
                 templateStream = new FileInputStream(templateFile);
             } else {
@@ -82,7 +83,7 @@ public final class ExcelExporter {
     }
 
     private File createOutputFile(String output) throws IOException {
-        var file = new File(output);
+        File file = new File(output);
         if (!file.exists()) {
             if (!file.createNewFile()) {
                 throw new ExportException("文件：" + output + "创建失败");
@@ -101,9 +102,9 @@ public final class ExcelExporter {
      */
     public static void export(IWorkbook data, OutputStream output, InputStream template) throws ExportException {
         try {
-            var workBookConfig = WorkBookConfigFactory.getWorkBookConfig(data);
+            WorkBookConfig workBookConfig = WorkBookConfigFactory.getWorkBookConfig(data);
 
-            var workbook = export(workBookConfig, data, template);
+            Workbook workbook = export(workBookConfig, data, template);
 
             workbook.setForceFormulaRecalculation(true);
             workbook.write(output);
@@ -123,11 +124,11 @@ public final class ExcelExporter {
      * @return 工作簿对象
      */
     public static Workbook export(WorkBookConfig workBookConfig, Object data, InputStream template) {
-        var type = workBookConfig.getWorkbookType();
-        var result = type.getWorkbook(template);
+        WorkbookType type = workBookConfig.getWorkbookType();
+        Workbook result = type.getWorkbook(template);
 
         //获得引入sheet配置信息
-        var sheetConfigs = workBookConfig.getSheetConfigs();
+        List<SheetConfig> sheetConfigs = workBookConfig.getSheetConfigs();
         if (sheetConfigs != null) {
             sheetConfigs.forEach((itemSheetConfig) -> {
                 try {
@@ -163,10 +164,10 @@ public final class ExcelExporter {
             rowIv = sheetConfig.getBaseRow();
             colIv = sheetConfig.getBaseCol();
         }
-        var repeatConfig = sheetConfig.getRepeatConfig();
+        RepeatConfig repeatConfig = sheetConfig.getRepeatConfig();
         if (repeatConfig == null) {
             //非循环写入工作表
-            var data = sheetConfig.getData(source);
+            Object data = sheetConfig.getData(source);
             Sheet writeDataSheet = null;
             //根据工作表配置创建具体写入工作表对象
             if (sheetConfig.getSheetType() == SheetType.INNER) {
@@ -177,14 +178,14 @@ public final class ExcelExporter {
             //将数据写入工作表
             this.writeSheetData(workbook, writeDataSheet, sheetConfig, data, rowIv, colIv);
         } else {
-            var max = repeatConfig.getMax();
-            var currentIndex = 0;
-            var data = sheetConfig.getData(source);
+            int max = repeatConfig.getMax();
+            int currentIndex = 0;
+            Object data = sheetConfig.getData(source);
             Sheet writeDataSheet = null;
             //检查数据是否为一个集合类型
             if (data instanceof Iterable) {
                 //迭代循环次数
-                for (var itemData : ((Iterable) data)) {
+                for (Object itemData : ((Iterable) data)) {
                     if (max > 0 && currentIndex >= max) {//最大循环次数判断
                         break;
                     }
@@ -198,7 +199,7 @@ public final class ExcelExporter {
                     this.writeSheetData(workbook, writeDataSheet, sheetConfig, itemData, rowIv, colIv);
 
                     //计算循环位移量
-                    var ivs = repeatConfig.getNextIv(currentIndex, source);
+                    int[] ivs = repeatConfig.getNextIv(currentIndex, source);
                     rowIv += ivs[0];
                     colIv += ivs[1];
 
@@ -225,8 +226,8 @@ public final class ExcelExporter {
      * @param data       单元格数据所属对象
      */
     private void writeCell(Workbook workbook, Sheet sheet, CellConfig cellConfig, Object data, int rowIv, int colIv) throws ExportException {
-        var repeatConfig = cellConfig.getRepeatConfig();
-        var cellData = cellConfig.getData(data);//获取单元格数据
+        RepeatConfig repeatConfig = cellConfig.getRepeatConfig();
+        Object cellData = cellConfig.getData(data);//获取单元格数据
         if (cellData == null) {//数据为空时，跳出
             return;
         }
@@ -237,18 +238,18 @@ public final class ExcelExporter {
                 throw new ExportException("写入第" + cellConfig.getRowIndex() + "行，第" + cellConfig.getCellIndex() + "列数据失败", e);
             }
         } else {
-            var currentIndex = 0;
-            var max = repeatConfig.getMax();
+            int currentIndex = 0;
+            int max = repeatConfig.getMax();
             if (cellData instanceof Iterable) {//检查循环写入的数据类型是否可迭代
                 try {
-                    for (var dataItem : ((Iterable) cellData)) {//迭代数据
+                    for (Object dataItem : ((Iterable) cellData)) {//迭代数据
                         if (max > 0 && currentIndex >= max) {//最大循环次数判断
                             break;
                         }
                         this.writeCellData(workbook, sheet, cellConfig, dataItem, rowIv, colIv, data);//写入单元格数据
 
                         //设置循环位移量
-                        var ivs = repeatConfig.getNextIv(currentIndex, data);
+                        int[] ivs = repeatConfig.getNextIv(currentIndex, data);
                         rowIv += ivs[0];
                         colIv += ivs[1];
 
@@ -274,24 +275,24 @@ public final class ExcelExporter {
      * @param colIv      列坐标修正值
      */
     private void writeCellData(Workbook workbook, Sheet sheet, CellConfig cellConfig, Object cellData, int rowIv, int colIv, Object cellDataSource) throws ExportException {//写入cell 数据
-        var mergedConfig = cellConfig.getMergedConfig();
+        MergedConfig mergedConfig = cellConfig.getMergedConfig();
         Cell cell;
         if (mergedConfig == null) {//检查是否需要合并单元格
             //根据行坐标、列坐标、行权重、列权重获取单元格
             cell = this.getCell(getRow(sheet, cellConfig.getRowIndex() + rowIv), cellConfig.getCellIndex() + colIv);
         } else {
             //根据合并单元格配置，行权重，列权重获取单元格
-            var mergePosition = mergedConfig.getMergedPosition(cellDataSource);
+            int[] mergePosition = mergedConfig.getMergedPosition(cellDataSource);
             cell = this.getMergedCell(sheet,
                     mergePosition[0] + rowIv,
                     mergePosition[1] + colIv,
                     mergePosition[2] + rowIv,
                     mergePosition[3] + colIv);
         }
-        var dataType = cellConfig.getDataType();//数据类型
-        var formatterConfig = cellConfig.getFormatterConfig();//数据格式化配置
+        CellDataType dataType = cellConfig.getDataType();//数据类型
+        FormatterConfig formatterConfig = cellConfig.getFormatterConfig();//数据格式化配置
         if (formatterConfig != null) {//写入格式化配置
-            var formatterPattern = formatterConfig.getFormatString();
+            String formatterPattern = formatterConfig.getFormatString();
             if (formatterPattern != null && !"".equals(formatterPattern)) {//设置excel中数据格式化的格式
                 this.getCellStyle(cell, workbook)
                         .setDataFormat(workbook.createDataFormat().getFormat(formatterPattern));
