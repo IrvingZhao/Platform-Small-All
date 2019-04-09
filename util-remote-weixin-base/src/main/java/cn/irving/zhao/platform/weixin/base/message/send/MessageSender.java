@@ -7,8 +7,13 @@ import cn.irving.zhao.util.remote.http.HttpClient;
 import cn.irving.zhao.util.remote.http.enums.HttpMethod;
 import cn.irving.zhao.util.remote.http.enums.RequestType;
 import cn.irving.zhao.util.remote.http.message.HttpMessage;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Map;
 
 /**
@@ -19,7 +24,13 @@ import java.util.Map;
  * @since 1.0
  */
 public class MessageSender {
-    private static final ObjectStringSerialUtil serialUtil = ObjectStringSerialUtil.getSerialUtil();
+    private static final ObjectStringSerialUtil serialUtil = ObjectStringSerialUtil.newInstance();
+
+    static {
+        serialUtil.configure(JsonParser.Feature.ALLOW_UNQUOTED_CONTROL_CHARS, true);
+        serialUtil.configure(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT, true);
+    }
+
     private HttpClient httpUtil = new HttpClient();
 
     /**
@@ -40,7 +51,7 @@ public class MessageSender {
                 break;
         }
         Class<? extends T> inputClass = outputMessage.getInputMessageClass();
-        return serialUtil.parse(httpMessage.responseStream, inputClass, serialType);
+        return serialUtil.parse(httpMessage.responseStream,inputClass,serialType);
 //      TODO 请求结果非200情况下的异常信息
     }
 
