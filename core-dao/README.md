@@ -1,4 +1,4 @@
-###数据库操作核心类
+### 数据库操作核心类
 
 > 基于``tkMapper`` 提供自动生成单表Mapper类，具体Mapper类需继承``cn.irving.zhao.platform.core.dao.CustomMapper``，而后配置相关Mapper类扫描目录，具体配置可参照 [tkMapper](https://github.com/abel533/Mapper)
 
