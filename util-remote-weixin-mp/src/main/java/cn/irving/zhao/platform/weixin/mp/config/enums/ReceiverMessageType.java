@@ -14,7 +14,7 @@ public enum ReceiverMessageType implements CustomEnumValue<ReceiverMessageType, 
     SHORT_VIDEO("shortvideo"),
     LOCATION("location"),
     LINK("link"),
-    EVENT("EVENT"),
+    EVENT("event"),
     ;
 
     private String code;

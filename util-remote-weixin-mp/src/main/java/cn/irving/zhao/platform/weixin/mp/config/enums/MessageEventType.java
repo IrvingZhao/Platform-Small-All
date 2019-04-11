@@ -12,6 +12,8 @@ public enum MessageEventType implements CustomEnumValue<MessageEventType, String
      */
     TEMPLATE("TEMPLATESENDJOBFINISH"),
     SUBSCRIBE("subscribe"),
+    UNSUBSCRIBE("unsubscribe"),
+    SCAN("SCAN"),
     LOCATION("LOCATION"),
     CLICK("CLICK"),
     VIEW("VIEW"),

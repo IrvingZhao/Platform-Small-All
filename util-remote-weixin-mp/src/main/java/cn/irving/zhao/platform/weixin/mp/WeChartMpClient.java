@@ -195,6 +195,8 @@ public final class WeChartMpClient {
         if (this.messageExecutor == null) {
             return "success";
         }
+        //TODO 消息加密
+        //TODO 消息去重
         ReceiveMessage message = SERIAL_UTIL.parse(stream, ReceiveMessage.class, ObjectStringSerialUtil.SerialType.XML);
         BaseReplayMessage replayMessage = this.messageExecutor.execute(configName, message);
         if (replayMessage == null) {
