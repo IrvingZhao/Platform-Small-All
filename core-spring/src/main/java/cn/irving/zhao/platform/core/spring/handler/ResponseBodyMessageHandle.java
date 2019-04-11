@@ -1,5 +1,6 @@
 package cn.irving.zhao.platform.core.spring.handler;
 
+import cn.irving.zhao.platform.core.spring.annotation.SuccessMessage;
 import cn.irving.zhao.platform.core.spring.controller.ResponseBodyHandleController;
 import cn.irving.zhao.platform.core.spring.exception.CodeException;
 import lombok.Getter;
@@ -25,6 +26,10 @@ public class ResponseBodyMessageHandle implements ResponseBodyAdvice {
 
     @Getter
     @Setter
+    private String successMsg;
+
+    @Getter
+    @Setter
     private String successCode = "000000";
 
     @Getter
@@ -40,11 +45,25 @@ public class ResponseBodyMessageHandle implements ResponseBodyAdvice {
     }
 
     @Override
-    public Object beforeBodyWrite(Object body, MethodParameter returnType, MediaType selectedContentType, Class selectedConverterType, ServerHttpRequest request, ServerHttpResponse response) {
+    public Object beforeBodyWrite(Object body, MethodParameter returnType, MediaType selectedContentType,
+                                  Class selectedConverterType, ServerHttpRequest request, ServerHttpResponse response) {
+        String code;
+        String msg;
+        SuccessMessage successMessage = returnType.getAnnotatedElement().getAnnotation(SuccessMessage.class);
+        if (successMessage == null) {
+            successMessage = returnType.getContainingClass().getAnnotation(SuccessMessage.class);
+        }
+        if (successMessage != null) {
+            code = successMessage.code();
+            msg = successMessage.msg();
+        } else {
+            code = this.successCode;
+            msg = this.successMsg;
+        }
         Map<String, Object> resultValue = new HashMap<>();
         resultValue.put("success", true);
-        resultValue.put("code", successCode);
-        resultValue.put("msg", "");
+        resultValue.put("code", code);
+        resultValue.put("msg", msg);
         resultValue.put("data", body);
         return resultValue;
     }
