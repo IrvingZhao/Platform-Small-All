@@ -23,6 +23,12 @@ public class NewsItem {
     private String url;//图文页地址
     @JsonProperty("content_source_url")
     private String contentSourceUrl;//阅读原文地址
+    @JsonProperty("thumb_url")
+    private String thumbUrl;
+    @JsonProperty("need_open_comment")
+    private BoolType needOpenComment;
+    @JsonProperty("only_fans_can_comment")
+    private BoolType onlyFansCanComment;
 
     public void setShowCoverPic(Boolean showCoverPic) {
         this.showCoverPic = showCoverPic ? BoolType.TRUE : BoolType.FALSE;
