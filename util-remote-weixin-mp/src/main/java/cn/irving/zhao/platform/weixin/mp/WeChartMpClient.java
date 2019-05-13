@@ -110,7 +110,7 @@ public final class WeChartMpClient {
 
             if (this.tokenManager == null) {
                 try {
-                    String configManagerClassName = properties.getProperty("wx.client.configManager",
+                    String configManagerClassName = properties.getProperty("wx.client.tokenManager",
                             "cn.irving.zhao.platform.weixin.mp.token.impl.DefaultAccessTokenManager");
                     this.tokenManager = this.getOneByName(configManagerClassName, AccessTokenManager.class);
                 } catch (Exception e) {
@@ -120,7 +120,7 @@ public final class WeChartMpClient {
 
             if (this.messageExecutor == null) {
                 try {
-                    String configManagerClassName = properties.getProperty("wx.client.configManager");
+                    String configManagerClassName = properties.getProperty("wx.client.messageExecutor");
                     if (configManagerClassName != null && !"".equals(configManagerClassName)) {
                         this.messageExecutor = this.getOneByName(configManagerClassName, MessageExecutor.class);
                     }

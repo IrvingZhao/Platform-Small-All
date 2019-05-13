@@ -13,7 +13,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Timer;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Function;
 
 /**
@@ -27,95 +30,70 @@ public final class DefaultAccessTokenManager implements AccessTokenManager {
 
     private static final Timer TOKEN_REFRESH_TIMER = new Timer();
 
-    private Map<String, ReentrantLock> lockMap = new HashMap<>();
+    private Map<String, ReadWriteLock> lockMap = new ConcurrentHashMap<>();
 
     private WeChartConfigManager configManager;
 
     private Function<AccessTokenOutputMessage, AccessTokenInputMessage> tokenLoader;
 
-    /**
-     * 初始化数据
-     */
     @Override
     public void init(WeChartConfigManager configManager, Function<AccessTokenOutputMessage, AccessTokenInputMessage> tokenLoader) {
         this.configManager = configManager;
         this.tokenLoader = tokenLoader;
-
-        Map<String, WeChartMpConfig> configs = configManager.getConfigs();
-        configs.entrySet().parallelStream().forEach((item) -> {
-            lockMap.put(item.getKey(), new ReentrantLock());
-            WeChartMpConfig itemConfig = item.getValue();
-            AccessTokenOutputMessage tokenOutputMessage = new AccessTokenOutputMessage(itemConfig.getAppId(), itemConfig.getAppSecurity());
-            AccessTokenInputMessage tokenInputMessage = tokenLoader.apply(tokenOutputMessage);
-            String errorCode = tokenInputMessage.getErrCode();
-            if (errorCode == null || errorCode.equals("0")) {
-                tokenCache.put(item.getKey(), new AccessTokenInfo(tokenInputMessage.getAccessToken()));
-                long expireTime = (tokenInputMessage.getExpiresIn() - 120) * 1000;//微信Token失效时间 7200秒，提前2分钟刷新对用token，x1000转为毫秒
-                TOKEN_REFRESH_TIMER.schedule(new TokenRefreshTimerTask(this, item.getKey()),
-                        expireTime, expireTime);
-                LOGGER.info("DefaultAccessTokenManager - refresh token schedule start - " + expireTime);
-            } else {
-                LOGGER.error("TOKEN获取异常：" + tokenInputMessage.getErrMsg());
-            }
-        });
     }
 
-    /**
-     * 重新获取Token
-     *
-     * @param name 配置的name值
-     */
     @Override
     public void refreshToken(String name) {
-        LOGGER.info("StartRefreshToken");
-        ReentrantLock lock = lockMap.get(name);
-        AccessTokenInfo tokenInfo = tokenCache.get(name);
-        if (lock.isLocked()) {
+        LOGGER.info("StartRefreshToken ==== {}", name);
+        ReadWriteLock lock = lockMap.computeIfAbsent(name, k -> new ReentrantReadWriteLock());
+        Lock writeLock = lock.writeLock();
+        Lock readLock = lock.readLock();
+        if (!writeLock.tryLock()) {
+            LOGGER.info("Wait Refresh Token ==== {}", name);
+            readLock.lock();//获取读锁
+            LOGGER.info("Wait Finished ==== {}", name);
             return;
         }
-        //多线程锁+读写锁
-        lock.lock();
-        if (tokenInfo == null) {
-            tokenInfo = new AccessTokenInfo("");
-        }
-        tokenInfo.lockWrite();
+        LOGGER.info("Exec refresh token ==== {}", name);
+        AccessTokenInfo tokenInfo = tokenCache.computeIfAbsent(name, (k) -> new AccessTokenInfo(new TokenRefreshTimerTask(this, k)));//获取TokenInfo信息
+        WeChartMpConfig config = configManager.getConfig(name);
         try {
-            WeChartMpConfig mpConfig = configManager.getConfig(name);
-            if (mpConfig != null) {
-                String token = getToken(mpConfig);
-                tokenCache.putIfAbsent(name, tokenInfo);
-                tokenInfo.setToken(token);
-                LOGGER.info("Token Refreshed - NewToken：" + token.substring(0, 5) + "*******");
+            if (config == null) {
+                LOGGER.info("Not Found Config, Clear Timers ==== {}", name);
+                // 取消定时器，并移除tokenInfo
+                tokenInfo.getRefreshTask().cancel();
+                tokenCache.remove(name);
+                throw new NullPointerException("Cannot find WeChartMpConfig by name [" + name + "]");//抛出未找到 配置异常
             } else {
-                throw new NullPointerException("Cannot find WeChartMpConfig by name [" + name + "]");
+                LOGGER.info("Send Token Refresh Request ==== {}", name);
+                AccessTokenOutputMessage tokenOutputMessage = new AccessTokenOutputMessage(config.getAppId(), config.getAppSecurity());
+                AccessTokenInputMessage tokenInputMessage = this.tokenLoader.apply(tokenOutputMessage);
+                if (tokenInputMessage.getErrCode() != null && !"".equals(tokenInputMessage.getErrCode())) {
+                    LOGGER.error("GET TOKEN FAIL：error message is [" + tokenInputMessage.getErrCode() + "]，reason is [" + tokenInputMessage.getErrMsg() + "]");
+                    throw new RuntimeException("error message is [" + tokenInputMessage.getErrCode() + "]，reason is [" + tokenInputMessage.getErrMsg() + "]");//获取token异常
+                }
+                LOGGER.info("Set Token ==== {}", name);
+                tokenInfo.setToken(tokenInputMessage.getAccessToken());
+                if (tokenInfo.getRefreshTask().scheduledExecutionTime() == 0) {//下次执行时间为0，表示为开启定时器
+                    LOGGER.info("Start RefreshTimer ==== {}", name);
+                    long expireTime = (tokenInputMessage.getExpiresIn() - 120) * 1000;//微信Token失效时间 7200秒，提前2分钟刷新对用token，x1000转为毫秒
+                    TOKEN_REFRESH_TIMER.schedule(tokenInfo.getRefreshTask(), expireTime, expireTime);
+                }
+
             }
         } finally {
-            lock.unlock();
-            tokenInfo.unlockWrite();
+            LOGGER.info("RefreshToken Finish ==== {}", name);
+            writeLock.unlock();
         }
     }
 
-    /**
-     * 获取指定名字配置的Token信息
-     *
-     * @param name 配置的name值
-     */
     @Override
     public String getToken(String name) {
         AccessTokenInfo tokenInfo = tokenCache.get(name);
         if (tokenInfo == null) {
-            refreshToken(name);
-            return getToken(name);
+            this.refreshToken(name);//刷新token，阻塞方法
+            tokenInfo = tokenCache.get(name);//重新获取tokenInfo
         }
         return tokenInfo.getToken();
-    }
-
-    private String getToken(WeChartMpConfig mpConfig) {
-        AccessTokenOutputMessage tokenOutputMessage = new AccessTokenOutputMessage(mpConfig.getAppId(), mpConfig.getAppSecurity());
-        AccessTokenInputMessage tokenInputMessage = this.tokenLoader.apply(tokenOutputMessage);
-        if (tokenInputMessage.getErrCode() != null && !"".equals(tokenInputMessage.getErrCode())) {
-            LOGGER.error("GET TOKEN FAIL：error message is [" + tokenInputMessage.getErrCode() + "]，reason is [" + tokenInputMessage.getErrMsg() + "]");
-        }
-        return tokenInputMessage.getAccessToken();
     }
 }
