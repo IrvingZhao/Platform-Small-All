@@ -1,6 +1,7 @@
 package cn.irving.zhao.util.poi.annonation;
 
 import cn.irving.zhao.util.poi.enums.CellDataType;
+import cn.irving.zhao.util.poi.formatter.CellStyleSetter;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -33,4 +34,9 @@ public @interface Cell {
      * @return 单元格数据类型
      */
     CellDataType dataType() default CellDataType.AUTO;
+
+    /**
+     * 样式设置器
+     */
+    Class<? extends CellStyleSetter> styleSetter() default CellStyleSetter.class;
 }

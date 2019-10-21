@@ -5,6 +5,7 @@ import cn.irving.zhao.util.poi.enums.CellDataType;
 import cn.irving.zhao.util.poi.enums.SheetType;
 import cn.irving.zhao.util.poi.enums.WorkbookType;
 import cn.irving.zhao.util.poi.exception.ExportException;
+import cn.irving.zhao.util.poi.formatter.CellStyleSetter;
 import cn.irving.zhao.util.poi.inter.IWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
@@ -288,6 +289,10 @@ public final class ExcelExporter {
                     mergePosition[1] + colIv,
                     mergePosition[2] + rowIv,
                     mergePosition[3] + colIv);
+        }
+        CellStyleSetter styleSetter = cellConfig.getStyleSetter(); // 获取样式设置器
+        if (styleSetter != null) {
+            styleSetter.setCellStyle(this.getCellStyle(cell, workbook), cell, cellData);
         }
         CellDataType dataType = cellConfig.getDataType();//数据类型
         FormatterConfig formatterConfig = cellConfig.getFormatterConfig();//数据格式化配置

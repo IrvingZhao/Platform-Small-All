@@ -2,10 +2,7 @@ package cn.irving.zhao.util.poi.config;
 
 import cn.irving.zhao.util.poi.annonation.*;
 import cn.irving.zhao.util.poi.enums.CellDataType;
-import cn.irving.zhao.util.poi.formatter.CellDataFormatter;
-import cn.irving.zhao.util.poi.formatter.MergedRegionFormatter;
-import cn.irving.zhao.util.poi.formatter.RepeatCheck;
-import cn.irving.zhao.util.poi.formatter.RepeatIVFormatter;
+import cn.irving.zhao.util.poi.formatter.*;
 import lombok.Getter;
 
 import java.util.Collection;
@@ -18,11 +15,16 @@ import java.util.function.Function;
 @Getter
 public class CellConfig {
 
+    private static FormatterFactory<CellStyleSetter> factory = FormatterFactory.getFormatterFactory(CellStyleSetter.class);
+
     CellConfig(Cell cell, Repeatable repeatable, MergedFormat mergedFormat, MergedPosition mergedPosition, Formatter formatter,
                Function<Object, Object> dataGetter, BiConsumer<Object, Object> dataSetter, Class<?> type) {
         this.rowIndex = cell.rowIndex();
         this.cellIndex = cell.colIndex();
         this.dataType = cell.dataType();
+        if (cell.styleSetter() != CellStyleSetter.class) {
+            this.styleSetter = factory.getFormatter(cell.styleSetter());
+        }
         if (repeatable != null) {
             this.repeatConfig = new RepeatConfig(repeatable);
         }
@@ -180,5 +182,7 @@ public class CellConfig {
     private BiConsumer<Object, Object> dataSetter;//数据设置器
 
     private Class<?> type;//单元格对应属性类型，读取数据时使用
+
+    private CellStyleSetter styleSetter;
 
 }
